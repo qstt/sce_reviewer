@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+    <hibernate-mapping>
+    
+	<!-- 配置类和表结构的映射 -->
+	<class name="ustc.sce.domain.Collection" table="collection">
+		<id name="id" column="id">
+			<!-- 主键的生成策略 -->
+			<generator class="native"/>
+		</id>
+		
+		<!-- 配置多对多 
+			name 	集合的名称
+			table	中间表的名称
+		-->
+		<set name="collectUsers" table="collection_user" lazy="false">
+			<!-- 当前对象在中间表的外键的名称 -->
+			<key column="collectionId"/>
+			<!--
+				class	集合中存入对象，对象的全路径
+				column	集合中对象在中间表的外键的名称
+			-->
+			<many-to-many class="ustc.sce.domain.User" column="collectUserId"/>
+		</set>
+		<set name="collectPapers" table="collection_paper" cascade="save-update" lazy="false">
+			<!-- 当前对象在中间表的外键的名称 -->
+			<key column="collectionId"/>
+			<!--
+				class	集合中存入对象，对象的全路径
+				column	集合中对象在中间表的外键的名称
+			-->
+			<many-to-many class="ustc.sce.domain.Paper" column="collectPaperId"/>
+		</set>
+		
+	</class>
+	
+</hibernate-mapping>    

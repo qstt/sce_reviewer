@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	<class name="ustc.sce.domain.PaperReview" table="paper_review">
+		<id name="id" column="id">
+			<generator class="native"/>
+		</id>
+		
+		<property name="paperStatus" column="paperStatus"/>
+		
+		<!-- 配置多方 
+			name	当前JavaBean中的属性
+			class	属性的全路径
+			column	外键的字段
+		-->
+		<many-to-one name="paper" class="ustc.sce.domain.Paper" column="paperId" cascade="save-update" unique="true" lazy="false"/>
+		<many-to-one name="user" class="ustc.sce.domain.User" column="userId"/>
+		
+	</class>
+	
+</hibernate-mapping>

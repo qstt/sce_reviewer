@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	
+	<class name="ustc.sce.domain.FileEntity" table="file">
+		<id name="id" column="id">
+			<generator class="native"/>
+		</id>
+		
+		<property name="fileName" column="fileName"/>
+		<property name="fileType" column="fileType"/>
+		<property name="filePath" column="filePath"/>
+		
+		<!-- 配置多方 
+			name	当前JavaBean中的属性
+			class	属性的全路径
+			column	外键的字段
+		-->
+		<many-to-one name="user" class="ustc.sce.domain.User" column="userId" cascade="save-update" lazy="false"/>
+		
+		
+		<!-- 配置一方 -->
+		<!--
+			set标签name属性：表示集合的名称
+		-->
+		<set name="papers" cascade="save-update" inverse="true" lazy="false">
+			<!-- 需要出现子标签 -->
+			<!-- 外键的字段 -->
+			<key column="paper_file_id"/>
+			<one-to-many class="ustc.sce.domain.Paper"/>
+		</set>
+	</class>
+	
+</hibernate-mapping>

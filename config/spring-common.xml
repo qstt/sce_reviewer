@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+	<!-- Spring注解方式注入 -->
+    <context:annotation-config /> 
+    <!-- 使用annotation 自动注册bean,并保证@Required,@Autowired的属性被注入 -->
+    <context:component-scan base-package="ustc.sce" >
+    	<!-- annotation为spting-mvc中解析的内容 -->
+            <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+	<!-- 先配置c3p0的连接池 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql:///reviewer" />
+		<property name="user" value="root" />
+		<property name="password" value="root" />
+	</bean>
+
+	<!-- LocalSessionFactoryBean加载配置文件 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 先加载连接池 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 加载方言，加载可选 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+
+		<!-- 引入映射的配置文件 -->
+		<property name="mappingResources">
+			<list>
+				<value>ustc/sce/domain/User.hbm.xml</value>
+				<value>ustc/sce/domain/Role.hbm.xml</value>
+				<value>ustc/sce/domain/FileEntity.hbm.xml</value>
+				<value>ustc/sce/domain/Token.hbm.xml</value>
+				<value>ustc/sce/domain/PaperReview.hbm.xml</value>
+				<value>ustc/sce/domain/Paper.hbm.xml</value>
+				<value>ustc/sce/domain/Annotation.hbm.xml</value>
+				<value>ustc/sce/domain/Collection.hbm.xml</value>
+				
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 先配置平台事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	
+	<!-- 开启事务的注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+	
+	<!-- 用户登录、注册 -->
+	<bean id="userService" class="ustc.sce.service.UserServiceImp">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	<bean id="userDao" class="ustc.sce.dao.UserDaoImp">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="tokenManager" class="ustc.sce.authorization.DefaultTokenManager">
+		<property name="tokenUtil" ref="tokenUtil"></property>
+	</bean>
+	
+	<!-- 文件上传 -->
+	<bean id="fileService" class="ustc.sce.service.FileServiceImp">
+		<property name="fileDao" ref="fileDao"></property>
+	</bean>
+	<bean id="fileDao" class="ustc.sce.dao.FileDaoImp">
+		<property name="pageUtil" ref="pageUtil"></property>
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- TokenDao -->
+	<bean id="tokenUtil" class="ustc.sce.utils.TokenUtil">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 论文评审 -->
+	<bean id="paperReviewService" class="ustc.sce.service.PaperReviewServiceImp">
+		<property name="paperReviewDao" ref="paperReviewDao"></property>
+	</bean>
+	<bean id="paperReviewDao" class="ustc.sce.dao.PaperReviewDaoImp">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 创建论文 -->
+	<bean id="paperService" class="ustc.sce.service.PaperServiceImp">
+		<property name="paperDao" ref="paperDao"></property>
+	</bean>
+	<bean id="paperDao" class="ustc.sce.dao.PaperDaoImp">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 文件批注 -->
+	<bean id="annotationService" class="ustc.sce.service.AnnotationServiceImp">
+		<property name="annotationDao" ref="annotationDao"></property>	
+	</bean>
+	<bean id="annotationDao" class="ustc.sce.dao.AnnotationDaoImp">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- PageUtil -->
+	<bean id="pageUtil" class="ustc.sce.utils.PageUtil">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 公开论文 -->
+	<bean id="publicPaperService" class="ustc.sce.service.PublicPaperServiceImp">
+		<property name="publicPaperDao" ref="publicPaperDao"></property>
+	</bean>
+	<bean id="publicPaperDao" class="ustc.sce.dao.PublicPaperDaoImp">
+		<property name="pageUtil" ref="pageUtil"></property>
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	
+	<!-- 个人中心 -->
+	<bean id="individualCenterService" class="ustc.sce.service.IndividualCenterServiceImp">
+		<property name="individualCenterDao" ref="individualCenterDao"></property>
+	</bean>
+	<bean id="individualCenterDao" class="ustc.sce.dao.IndividualCenterDaoImp">
+		<property name="pageUtil" ref="pageUtil"></property>
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+</beans>

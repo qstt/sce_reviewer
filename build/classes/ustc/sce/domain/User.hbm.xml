@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+    
+    <hibernate-mapping>
+    
+	<!-- 配置类和表结构的映射 -->
+	<class name="ustc.sce.domain.User" table="user">
+		<id name="id" column="id">
+			<!-- 主键的生成策略 -->
+			<generator class="native"/>
+		</id>
+		
+		<!-- 配置其他的属性 -->
+		<property name="userName" column="userName"/>
+		<property name="userPassword" column="userPassword"/>
+		
+		<!-- 配置多对多 
+			name 	集合的名称
+			table	中间表的名称
+		-->
+		<set name="roles" table="user_role" cascade="save-update" lazy="false">
+			<!-- 当前对象在中间表的外键的名称 -->
+			<key column="userId"/>
+			<!--
+				class	集合中存入对象，对象的全路径
+				column	集合中对象在中间表的外键的名称
+			-->
+			<many-to-many class="ustc.sce.domain.Role" column="roleId"/>
+		</set>
+		
+	</class>
+	
+</hibernate-mapping>    
