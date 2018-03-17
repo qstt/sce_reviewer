@@ -1,8 +1,5 @@
 package ustc.sce.domain;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
  * 用户：注册  登录
  * @author 秋色天堂
@@ -14,8 +11,8 @@ public class User {
 	private String userName;
 	private String userPassword;
 	
-	//用户和角色之间多对多的关联  只在用户这一方进行维护
-	private Set<Role> roles = new HashSet<Role>();
+	//用户和角色之间多对一的关联  只在用户这方进行维护
+	private Role role;
 
 	public int getId() {
 		return id;
@@ -41,13 +38,14 @@ public class User {
 		this.userPassword = userPassword;
 	}
 
-	public Set<Role> getRoles() {
-		return roles;
+	public Role getRole() {
+		return role;
 	}
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
+	public void setRole(Role role) {
+		this.role = role;
 	}
+
 	
 	
 	

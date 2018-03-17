@@ -20,10 +20,32 @@
         	<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
         </context:component-scan>
         
+        
+   
+        
+        
     <!-- 注解驱动:
 		作用:替我们自动配置最新版的注解的处理器映射器和处理器适配器
 	 -->
 	<mvc:annotation-driven></mvc:annotation-driven>
+	
+	 <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">  
+    <property name="messageConverters">  
+        <list>  
+            <ref bean="jsonHttpMessageConverter" />  
+        </list>  
+    </property>  
+	</bean>  
+  
+	<bean id="jsonHttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">  
+    <property name="supportedMediaTypes">  
+        <list>  
+            <value>application/json;charset=UTF-8</value>  
+        </list>  
+    </property>  
+	</bean>  
+	
+	
 	
 	<!-- 配置视图解析器 
 	作用:在controller中指定页面路径的时候就不用写页面的完整路径名称了,可以直接写页面去掉扩展名的名称

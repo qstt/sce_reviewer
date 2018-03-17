@@ -36,7 +36,7 @@ public class UserDaoImp extends HibernateDaoSupport implements UserDao {
         List<Role> list = query.list();
         Role role = list.get(0);
 		
-		user.getRoles().add(role);
+		user.setRole(role);
 		
 		Serializable save = this.getHibernateTemplate().getSessionFactory().getCurrentSession().save(user);
 		 if(save == null){

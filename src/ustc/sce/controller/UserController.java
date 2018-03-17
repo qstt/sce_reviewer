@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
@@ -44,7 +45,7 @@ public class UserController {
 	 * 检测用户是否已经注册
 	 * @return
 	 */
-	@RequestMapping(value = "/check", method = RequestMethod.POST,produces="text/html;charset=utf-8")
+	@RequestMapping(value = "/check", method = RequestMethod.GET,produces="text/html;charset=utf-8")
 	public String checkUser(@RequestParam("userName") String userName) {
 		
 		User user = userService.checkUser(userName);
@@ -58,7 +59,7 @@ public class UserController {
 	 * 获得用户角色   默认是学生
 	 * @return
 	 */
-	@RequestMapping(value = "/get_role", method = RequestMethod.POST,produces="text/html;charset=utf-8")
+	@RequestMapping(value = "/get_role", method = RequestMethod.GET,produces="text/html;charset=utf-8")
 	public String getRole() {
 		
 		List<Role> roles = userService.getRole();
@@ -67,12 +68,16 @@ public class UserController {
 		
 	}
 	
-	
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	public String register(@RequestParam("userName") String userName,
-			@RequestParam("userPassword") String userPassword,
-			@RequestParam("roleName") String roleName, HttpServletResponse response, HttpServletRequest request) throws UnsupportedEncodingException {
+	/**
+	 * 注册
+	 */
+	@RequestMapping(value = "/register", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
+	public String register(@RequestBody User user, HttpServletResponse response, HttpServletRequest request) throws UnsupportedEncodingException {
 
+		String userName = user.getUserName();
+		String userPassword = user.getUserPassword();
+		String roleName = user.getRole().getRoleName();
+		
 		String roleName1=new String(roleName.getBytes("iso-8859-1"), "utf-8");
 		
 		boolean flag = userService.register(userName, userPassword, roleName1);
@@ -82,12 +87,17 @@ public class UserController {
 		return JSON.toJSONString(new Response().failure("Register Failure..."));
 	}
 	
-	@RequestMapping(value = "/login", method = RequestMethod.POST,produces="text/html;charset=utf-8")
-	public String login(@RequestParam("userName") String userName, 
-			@RequestParam("userPassword") String userPassword,
+	/**
+	 * 登录
+	 */
+	@RequestMapping(value = "/login", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
+	public String login(@RequestBody User user,
 			HttpServletResponse response, HttpServletRequest request) {
 		
-		User user = userService.login(userName, userPassword);
+		String userName = user.getUserName();
+		String userPassword = user.getUserPassword();
+		
+		user = userService.login(userName, userPassword);
 		if (user != null) {
 			Token token = tokenManager.createToken(userName);
 			String token3 = token.getToken();
@@ -108,7 +118,7 @@ public class UserController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/exit", method = RequestMethod.POST)
+	@RequestMapping(value = "/exit", method = RequestMethod.GET)
 	public String exit(@RequestParam("userName") String userName) {
 		
 		boolean flag = userService.exit(userName);
@@ -120,7 +130,8 @@ public class UserController {
 	}
 	
 	/**
-	 * 重置密码
+	 * 这个接口暂时不用！！！
+	 * 重置密码    
 	 * 这样写不对    不应该是根据用户名直接改密码   后面再重新修改
 	 * 提供旧密码修改新的密码  如果是通过邮箱找回密码  因为开始的时候就没有设置有邮箱这个字段
 	 * @return
@@ -134,10 +145,4 @@ public class UserController {
 		return JSON.toJSONString(new Response().success(user));
 	}
 	
-
-	@RequestMapping(value = "/login1", method = RequestMethod.POST, produces = ("application/json;charset=UTF-8"))
-	public String login1(@RequestBody Token token, HttpServletRequest request) {
-		return JSON.toJSONString(new Response().success(token));
-	}
-
 }
