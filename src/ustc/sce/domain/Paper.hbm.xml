@@ -14,13 +14,6 @@
 		<property name="paperOwner" column="paperOwner"/>
 		<property name="ispublic" column="ispublic"/>
 		
-		<!-- 配置多方 
-			name	当前JavaBean中的属性
-			class	属性的全路径
-			column	外键的字段
-		-->
-		<many-to-one name="fileEntity" class="ustc.sce.domain.FileEntity" column="fileId" cascade="save-update"  lazy="false"/>
-		
 	</class>
 	
 </hibernate-mapping>

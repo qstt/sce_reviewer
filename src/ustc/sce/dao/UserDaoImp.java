@@ -59,23 +59,6 @@ public class UserDaoImp extends HibernateDaoSupport implements UserDao {
             return list.get(0);
 	}
 
-	@Override
-	public User resetPassword(String userName, String userPassword) {
-		
-		String hql="from User as user where user.userName='"+userName+"'";
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-        Query query =session.createQuery(hql);
-        List<User> list = query.list();
-        
-        User user = list.get(0);
-        user.setUserPassword(userPassword);
-        
-        this.getHibernateTemplate().getSessionFactory().getCurrentSession().update(user);
-        
-		return user;
-	}
-
-	@Override
 	public boolean exit(String userName) {
 		
 		String hql="from Token as token where token.userName='"+userName+"'";

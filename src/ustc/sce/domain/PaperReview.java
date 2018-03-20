@@ -8,7 +8,7 @@ package ustc.sce.domain;
 public class PaperReview {
 	
 	private int id;
-	//论文状态  未提交0  正在评审1  已定稿2
+	//论文状态  私有论文不进行提交0  未提交1  正在评审2  已定稿3
 	private int paperStatus;
 	
 	//关联论文  论文和论文评审状态是一对一的关系   

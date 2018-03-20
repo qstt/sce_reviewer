@@ -52,8 +52,8 @@
 				<value>ustc/sce/domain/Token.hbm.xml</value>
 				<value>ustc/sce/domain/PaperReview.hbm.xml</value>
 				<value>ustc/sce/domain/Paper.hbm.xml</value>
-				<value>ustc/sce/domain/Annotation.hbm.xml</value>
-				<value>ustc/sce/domain/Collection.hbm.xml</value>
+				<!-- <value>ustc/sce/domain/Annotation.hbm.xml</value> -->
+				<!-- <value>ustc/sce/domain/Collection.hbm.xml</value> -->
 				
 			</list>
 		</property>

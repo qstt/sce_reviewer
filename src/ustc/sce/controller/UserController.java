@@ -129,20 +129,4 @@ public class UserController {
 		
 	}
 	
-	/**
-	 * 这个接口暂时不用！！！
-	 * 重置密码    
-	 * 这样写不对    不应该是根据用户名直接改密码   后面再重新修改
-	 * 提供旧密码修改新的密码  如果是通过邮箱找回密码  因为开始的时候就没有设置有邮箱这个字段
-	 * @return
-	 */
-	@RequestMapping(value = "/reset", method = RequestMethod.POST)
-	public String resetPassword(@RequestParam("userName") String userName, 
-			@RequestParam("userPassword") String userPassword) {
-		
-		User user = userService.resetPassword(userName,userPassword);
-		
-		return JSON.toJSONString(new Response().success(user));
-	}
-	
 }

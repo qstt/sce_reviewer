@@ -147,6 +147,31 @@ public class FileController {
 	}
 	
 	/**
+	 * 分页显示该用户上传的文件  默认每页3条记录
+	 */
+	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileSearch(@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
+			@RequestParam(value = "pageSize", required = false, defaultValue = "3") int pageSize,
+			HttpServletRequest request) {
+		
+		String header = request.getHeader("X-Token");
+		User user = tokenUtil.getUser(header);
+
+		Page page = fileService.getForPage(Integer.valueOf(pageNo), pageSize,user);
+		List<FileEntity> pageFileEntity = page.getList();
+		if (!pageFileEntity.isEmpty()) {
+			for (int i = 0; i < pageFileEntity.size(); i++) {
+				String filePath = pageFileEntity.get(i).getFilePath();
+				filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
+				pageFileEntity.get(i).setFilePath(filePath);
+			}
+			return JSON.toJSONString(new Response().success(pageFileEntity));
+		}
+		return JSON.toJSONString(new Response().failure("FileList Failure..."));
+
+	}
+	
+	/**
 	 * 分页显示文件列表 默认每页3条记录
 	 */
 	@RequestMapping(value = "/list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
@@ -190,71 +215,6 @@ public class FileController {
 	
 /////////////////////////////下面的方法都不使用，测试中保留后面会删除//////////////////////////////////////////////////
 	
-	/**
-	 * 不使用
-	 */
-	@RequestMapping(value = "/delete2", method = RequestMethod.POST, produces = ("application/json;charset=UTF-8"))
-	public String fileDelete(@RequestBody FileEntity fileEntity) {
-		String path = fileEntity.getFilePath();
-		boolean flag = fileService.fileDelete(fileEntity);
-		if (flag) {
-			// 通过绝对路径删除文件
-			File file = new File(path);
-			file.delete();
-			return JSON.toJSONString(new Response().success("FileDelect Success..."));
-		}
-		return JSON.toJSONString(new Response().failure("FileDelect Failure..."));
-
-	}
-
-	/**
-	 * 不使用
-	 */
-	@RequestMapping(value = "/delete1", method = RequestMethod.POST)
-	public String fileDelete(@RequestParam("fileName") String fileName, HttpServletRequest request)
-			throws UnsupportedEncodingException {
-		System.out.println(request.getCharacterEncoding());
-
-		String str = new String(fileName.getBytes("iso-8859-1"), "utf-8");
-		// 中文文件名乱码问题没有解决？？？
-		System.out.println("controller" + "     " + str);
-		boolean flag = fileService.fileDelete(str);
-		if (flag) {
-			return JSON.toJSONString(new Response().success("FileDelect Success..."));
-		}
-		return JSON.toJSONString(new Response().failure("FileDelect Failure..."));
-	}
-
-	/**
-	 * 文件下载
-	 */
-	@RequestMapping(value = "/download1")
-	public void fileDownload(@RequestParam("fileName") String fileName, HttpServletResponse response)
-			throws IOException {
-
-		// 得到filePath 拼接真实路径
-		FileEntity fe = fileService.getFile(fileName);
-
-		if (fe != null) {
-
-			String fileType = fe.getFileType();
-			String filePath = fe.getFilePath();
-			String realPath = "J:\\eclipse\\apache-tomacat-7.0.47\\webapps\\upload\\" + filePath;
-
-			File file = new File(realPath);
-			OutputStream os = new BufferedOutputStream(response.getOutputStream());
-			response.setContentType("application/octet-stream");
-			fileName = fileName + "." + fileType;
-			response.setHeader("Content-disposition",
-					"attachment; filename=" + new String(fileName.getBytes("utf-8"), "ISO8859-1")); // 指定下载的文件名
-
-			os.write(FileUtils.readFileToByteArray(file));
-			os.flush();
-			os.close();
-		}
-
-	}
-
 	// 文件下载 第二种方法
 	@RequestMapping(value = "/download2")
 	public ResponseEntity<byte[]> download(@RequestParam("fileName") String fileName, HttpServletResponse response)
@@ -276,47 +236,5 @@ public class FileController {
 		headers.setContentDispositionFormData("attachment", dfileName);
 		return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);
 	}
-
-	/**
-	 * 显示文件列表（后面应该实现显示论文列表） charset=utf-8 处理文件中文名称
-	 * 
-	 * @return
-	 */
-	@RequestMapping(value = "/fileList1", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
-	public String fileList() {
-		List<FileEntity> fileEntity = fileService.fileList();
-		if (!fileEntity.isEmpty()) {
-			for (int i = 0; i < fileEntity.size(); i++) {
-				String filePath = fileEntity.get(i).getFilePath();
-				filePath = "J:\\eclipse\\apache-tomacat-7.0.47\\webapps\\upload\\" + filePath;
-				fileEntity.get(i).setFilePath(filePath);
-			}
-			// return (List<FileEntity>) JSON.toJSON(fileEntity);
-			return JSON.toJSONString(new Response().success(fileEntity));
-		}
-		return JSON.toJSONString(new Response().failure("FileList Failure..."));
-		// return (List<FileEntity>) JSON.toJSON(fileEntity);
-
-	}
-
-	/**
-	 * 文件详情 显示成网页版进行批注 文件名不能是中文 和delete1问题相同
-	 * 
-	 * @param fileName
-	 * @return
-	 */
-	@RequestMapping(value = "/fileShow", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
-	public String fileShow(@RequestParam("fileName") String fileName) {
-
-		String filePath = fileService.fielShow(fileName);
-
-		if (filePath != null) {
-			filePath = "J:\\eclipse\\apache-tomacat-7.0.47\\webapps\\upload\\" + filePath;
-			return JSON.toJSONString(new Response().success(filePath));
-		}
-		return JSON.toJSONString(new Response().failure("fileShow Failure..."));
-
-	}
-
 
 }

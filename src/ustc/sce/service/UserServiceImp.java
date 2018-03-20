@@ -43,16 +43,6 @@ public class UserServiceImp implements UserService {
 		return userDao.checkUser(userName);
 	}
 
-
-	@Override
-	public User resetPassword(String userName, String userPassword) {
-		
-		userPassword = MD5Utils.md5(userPassword);
-		return userDao.resetPassword(userName,userPassword);
-	}
-
-
-	@Override
 	public boolean exit(String userName) {
 		return userDao.exit(userName);
 	}

@@ -19,18 +19,7 @@
 			column	外键的字段
 		-->
 		<many-to-one name="user" class="ustc.sce.domain.User" column="userId" cascade="save-update" lazy="false"/>
-		
-		
-		<!-- 配置一方 -->
-		<!--
-			set标签name属性：表示集合的名称
-		-->
-		<set name="papers" cascade="save-update" inverse="true" lazy="false">
-			<!-- 需要出现子标签 -->
-			<!-- 外键的字段 -->
-			<key column="paper_file_id"/>
-			<one-to-many class="ustc.sce.domain.Paper"/>
-		</set>
+		<many-to-one name="paper" class="ustc.sce.domain.Paper" column="paperId" cascade="save-update" lazy="false"/>
 	</class>
 	
 </hibernate-mapping>

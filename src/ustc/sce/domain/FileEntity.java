@@ -1,7 +1,5 @@
 package ustc.sce.domain;
 
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * 上传的文件   默认为pdf文件
@@ -20,11 +18,9 @@ public class FileEntity {
 	
 	//用户和文件之间的关联   一个用户可以上传多个文件
 	//用户和文件是一对多关系   只在多方（文件）中维护这个关联
-	private User user;
+	private Paper paper;
 	
-	//文件和论文之间的关联   一个论文可以有多个文件（pdf)
-	//文件和论文是一对多关系   只在一方（文件）中维护这个关联
-	private Set<Paper> papers = new HashSet<Paper>();
+	private User user;
 
 	public int getId() {
 		return id;
@@ -58,6 +54,14 @@ public class FileEntity {
 		this.filePath = filePath;
 	}
 
+	public Paper getPaper() {
+		return paper;
+	}
+
+	public void setPaper(Paper paper) {
+		this.paper = paper;
+	}
+
 	public User getUser() {
 		return user;
 	}
@@ -65,18 +69,6 @@ public class FileEntity {
 	public void setUser(User user) {
 		this.user = user;
 	}
-
-	public Set<Paper> getPapers() {
-		return papers;
-	}
-
-	public void setPapers(Set<Paper> papers) {
-		this.papers = papers;
-	}
-
-	
-
 	
 	
-
 }
