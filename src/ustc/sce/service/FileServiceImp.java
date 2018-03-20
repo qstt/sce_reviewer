@@ -2,6 +2,8 @@ package ustc.sce.service;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import ustc.sce.dao.FileDao;
@@ -33,8 +35,8 @@ public class FileServiceImp implements FileService {
 	}
 
 	@Override
-	public boolean fileDelete(int fileId) {
-		return fileDao.fileDelete(fileId);
+	public boolean fileDelete(int fileId,HttpServletRequest request) {
+		return fileDao.fileDelete(fileId,request);
 	}
 
 	@Override
@@ -80,6 +82,12 @@ public class FileServiceImp implements FileService {
 
 	public Page getForPage(int currentPage, int pageSize) {
 		return fileDao.getForPage(currentPage, pageSize);
+	}
+
+
+	@Override
+	public FileEntity getFile(int fileId) {
+		return fileDao.getFile(fileId);
 	}
 	
 

@@ -3,6 +3,8 @@ package ustc.sce.dao;
 import java.io.File;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
@@ -57,7 +59,7 @@ public class FileDaoImp extends HibernateDaoSupport implements FileDao {
 	}
 	
 	
-	public boolean fileDelete(int fileId) {
+	public boolean fileDelete(int fileId,HttpServletRequest request) {
 		String hql="from FileEntity as file where file.id='"+fileId+"'";
 		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
         Query query =session.createQuery(hql);
@@ -66,7 +68,8 @@ public class FileDaoImp extends HibernateDaoSupport implements FileDao {
         	FileEntity fileEntity = list.get(0);
         	String path = fileEntity.getFilePath();
         	//path只是文件存储路径的后半部分  加上前面的才是完整的路径
-        	path = "J:\\eclipse\\apache-tomacat-7.0.47\\webapps\\upload\\" + path;
+        	//path = "J:\\eclipse\\apache-tomacat-7.0.47\\webapps\\upload\\" + path;   //绝对路径用
+        	path = request.getSession().getServletContext().getRealPath("\\") + path;  //相对路径用
         	File file = new File(path);
         	this.getHibernateTemplate().getSessionFactory().getCurrentSession().delete(fileEntity);
         	file.delete();
@@ -125,6 +128,18 @@ public class FileDaoImp extends HibernateDaoSupport implements FileDao {
 		String hql2="from FileEntity";
 		Page page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
 		return page;
+	}
+
+	@Override
+	public FileEntity getFile(int fileId) {
+		String hql="from FileEntity as file where file.id='"+fileId+"'";
+		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+        Query query =session.createQuery(hql);
+        List<FileEntity> list = query.list();
+        if(!list.isEmpty()){
+        	return list.get(0);
+        }
+        return null;
 	}
 
 //	@Override
