@@ -1,19 +1,16 @@
 package ustc.sce.controller;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
@@ -27,8 +24,7 @@ import ustc.sce.response.Response;
 import ustc.sce.service.UserService;
 
 /**
- * 用户控制层 登录 注册
- * 
+ * 用户控制层 检测用户是否已经注册  获得用户角色  注册  登录  退出登录
  * @author 秋色天堂
  *
  */
@@ -43,7 +39,8 @@ public class UserController {
 	
 	/**
 	 * 检测用户是否已经注册
-	 * @return
+	 * @param userName 注册时的用户名
+	 * @return  该用户是否已经注册
 	 */
 	@RequestMapping(value = "/check", method = RequestMethod.GET,produces="text/html;charset=utf-8")
 	public String checkUser(@RequestParam("userName") String userName) {
@@ -57,7 +54,7 @@ public class UserController {
 	
 	/**
 	 * 获得用户角色   默认是学生
-	 * @return
+	 * @return  数据库中所有的角色
 	 */
 	@RequestMapping(value = "/get_role", method = RequestMethod.GET,produces="text/html;charset=utf-8")
 	public String getRole() {
@@ -69,10 +66,13 @@ public class UserController {
 	}
 	
 	/**
-	 * 注册
+	 * 注册  前端传JSON格式数据
+	 * @param user 用户实体
+	 * @return  注册成功或者失败
+	 * @throws UnsupportedEncodingException
 	 */
 	@RequestMapping(value = "/register", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
-	public String register(@RequestBody User user, HttpServletResponse response, HttpServletRequest request) throws UnsupportedEncodingException {
+	public String register(@RequestBody User user) throws UnsupportedEncodingException {
 
 		String userName = user.getUserName();
 		String userPassword = user.getUserPassword();
@@ -88,12 +88,13 @@ public class UserController {
 	}
 	
 	/**
-	 * 登录
+	 * 登录  前端传JSON格式数据
+	 * @param user 用户实体
+	 * @param response 将token加入到cookie中
+	 * @return token user role
 	 */
 	@RequestMapping(value = "/login", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
-	public String login(@RequestBody User user,
-			HttpServletResponse response, HttpServletRequest request) {
-		
+	public String login(@RequestBody User user,HttpServletResponse response) {
 		String userName = user.getUserName();
 		String userPassword = user.getUserPassword();
 		
@@ -114,9 +115,9 @@ public class UserController {
 	}
 
 	/**
-	 * 退出登录   删除数据库中的token
-	 * @param response
-	 * @return
+	 * 退出登录
+	 * @param userName 用户名
+	 * @return 退出成功或失败
 	 */
 	@RequestMapping(value = "/exit", method = RequestMethod.GET)
 	public String exit(@RequestParam("userName") String userName) {

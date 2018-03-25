@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +18,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +33,11 @@ import ustc.sce.response.Response;
 import ustc.sce.service.FileService;
 import ustc.sce.utils.TokenUtil;
 
+/**
+ * 文件控制层   文件上传  删除文件  文件下载
+ * @author 秋色天堂
+ *
+ */
 @RestController
 @RequestMapping("/file")
 public class FileController {
@@ -46,10 +49,13 @@ public class FileController {
 
 	/**
 	 * 文件上传
+	 * @param file 上传的文件
+	 * @param request
+	 * @return 文件信息/上传失败
 	 */
 	@RequestMapping(value = "/upload", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
 	public String fileUplod(@RequestParam("file") MultipartFile file, HttpServletRequest request)
-			throws Exception, Exception {
+			throws Exception{
 
 		FileEntity fileUpload = new FileEntity();
 
@@ -105,6 +111,9 @@ public class FileController {
 
 	/**
 	 * 删除文件
+	 * @param fileId  文件id
+	 * @param request
+	 * @return 删除成功/失败
 	 */
 	@RequestMapping(value = "/delete", method = RequestMethod.GET)
 	public String fileDelete(@RequestParam("fileId") int fileId,HttpServletRequest request) {
@@ -117,6 +126,10 @@ public class FileController {
 	
 	/**
 	 * 文件下载
+	 * @param fileId  文件id
+	 * @param response
+	 * @param request
+	 * @throws IOException
 	 */
 	@RequestMapping(value = "/download",method = RequestMethod.GET)
 	public void fileDownload(@RequestParam("fileId") int fileId, HttpServletResponse response,HttpServletRequest request)
@@ -147,10 +160,14 @@ public class FileController {
 	}
 	
 	/**
-	 * 分页显示该用户上传的文件  默认每页3条记录
+	 * 分页显示该用户上传的文件
+	 * @param pageNo 当前页面  默认1
+	 * @param pageSize 每页显示记录条数  默认3
+	 * @param request
+	 * @return List<FileEntity>
 	 */
-	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String fileSearch(@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
+	@RequestMapping(value = "/user_list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileUserList(@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "3") int pageSize,
 			HttpServletRequest request) {
 		
@@ -172,10 +189,30 @@ public class FileController {
 	}
 	
 	/**
-	 * 分页显示文件列表 默认每页3条记录
+	 * 不分页显示该用户上传的文件
+	 * @param request
+	 * @return  List<FileEntity>
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String fileList(@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
+	@RequestMapping(value = "/nopage_list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileNoPageList(HttpServletRequest request) {
+		String header = request.getHeader("X-Token");
+		User user = tokenUtil.getUser(header);
+		
+		List<FileEntity> fileEntitys = fileService.fileNoPageList(user);
+		
+		return JSON.toJSONString(new Response().success(fileEntitys));
+	}
+	
+	
+	/**
+	 * 分页显示所有文件列表
+	 * @param pageNo 当前页面  默认为1
+	 * @param pageSize 每页显示记录条数  默认为3
+	 * @param request
+	 * @return List<FileEntity>
+	 */
+	@RequestMapping(value = "/all_list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileAllList(@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "3") int pageSize,
 			HttpServletRequest request) {
 
@@ -194,16 +231,17 @@ public class FileController {
 	}
 	
 	/**
-	 * 文件详情 显示成网页版进行批注 传入fileId 返回file用file中的filePath
+	 * 文件详情 显示成网页版进行批注
+	 * @param fileId  文件id
+	 * @param request
+	 * @return file 使用filePath
 	 */
 	@RequestMapping(value = "/show", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String fileShow(@RequestParam("fileId") int fileId) {
-
-		FileEntity file = fileService.fielShow(fileId);
-
+	public String fileShow(@RequestParam("fileId") int fileId,HttpServletRequest request) {
+		FileEntity file = fileService.getFile(fileId);
 		if (file != null) {
 			String filePath = file.getFilePath();
-			filePath = "J:\\eclipse\\apache-tomacat-7.0.47\\webapps\\upload\\" + filePath;
+			filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
 			file.setFilePath(filePath);
 			return JSON.toJSONString(new Response().success(file));
 		}
@@ -211,13 +249,66 @@ public class FileController {
 
 	}
 	
+	/**
+	 * 按文件名查找所有文件 分页显示
+	 * @param keyWords 关键字
+	 * @param pageNo 当前页面
+	 * @param pageSize 每页显示记录条数
+	 * @param request
+	 * @return List<FileEntity>
+	 */
+	@RequestMapping(value = "/all_search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileAllSearch(@RequestParam("keyWords") String keyWords,
+			@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
+			@RequestParam(value = "pageSize", required = false, defaultValue = "3") int pageSize,
+			HttpServletRequest request) {
+
+		int currentPage = Integer.valueOf(pageNo);
+		
+		Page page = fileService.getForPage(currentPage, pageSize,keyWords);
+		List<FileEntity> pageFileEntity = page.getList();
+		if (!pageFileEntity.isEmpty()) {
+			for (int i = 0; i < pageFileEntity.size(); i++) {
+				String filePath = pageFileEntity.get(i).getFilePath();
+				filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
+				pageFileEntity.get(i).setFilePath(filePath);
+			}
+			return JSON.toJSONString(new Response().success(pageFileEntity));
+		}
+		return JSON.toJSONString(new Response().failure("FileList Failure..."));
+
+	}
+	
+	/**
+	 * 按文件名查找该用户上传文件  不用分页显示
+	 * @param keyWords 查询关键字
+	 * @param request
+	 * @return List<FileEntity>
+	 */
+	@RequestMapping(value = "/user_search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileUserSearch(@RequestParam("keyWords") String keyWords,HttpServletRequest request) {
+		String header = request.getHeader("X-Token");
+		User user = tokenUtil.getUser(header);
+		
+		List<FileEntity> fileEntitys = fileService.fileNoPageList(user,keyWords);
+		   
+		return JSON.toJSONString(new Response().success(fileEntitys));
+		
+	}
+	
 
 	
 /////////////////////////////下面的方法都不使用，测试中保留后面会删除//////////////////////////////////////////////////
 	
-	// 文件下载 第二种方法
+	/**
+	 * 下载文件第2种方法   项目中没有使用
+	 * @param fileName 文件名
+	 * @param HttpServletRequest request
+	 * @return
+	 * @throws IOException
+	 */
 	@RequestMapping(value = "/download2")
-	public ResponseEntity<byte[]> download(@RequestParam("fileName") String fileName, HttpServletResponse response)
+	public ResponseEntity<byte[]> download(@RequestParam("fileName") String fileName, HttpServletRequest request)
 			throws IOException {
 
 		FileEntity fe = fileService.getFile(fileName);
@@ -227,7 +318,7 @@ public class FileController {
 		}
 		String fileType = fe.getFileType();
 		String filePath = fe.getFilePath();
-		String realPath = "J:\\eclipse\\apache-tomacat-7.0.47\\webapps\\upload\\" + filePath;
+		String realPath = request.getSession().getServletContext().getRealPath("\\") + filePath;
 		File file = new File(realPath);
 		fileName = fileName + "." + fileType;
 		String dfileName = new String(fileName.getBytes("UTF-8"), "iso8859-1");

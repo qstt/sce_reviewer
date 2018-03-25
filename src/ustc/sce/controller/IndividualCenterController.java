@@ -19,6 +19,11 @@ import ustc.sce.response.Response;
 import ustc.sce.service.IndividualCenterService;
 import ustc.sce.utils.TokenUtil;
 
+/**
+ * 个人中心控制层   我的论文  我的批注  我的收藏
+ * @author 秋色天堂
+ *
+ */
 @RestController
 @RequestMapping("/individual_center")
 public class IndividualCenterController {
@@ -31,13 +36,17 @@ public class IndividualCenterController {
 	
 	
 ////////////////////我的收藏////////////////////
+	
 	/**
-	 * 我的收藏论文显示  默认每页显示5条记录    功能没有完成       数据库部分操作有些问题？？？
-	 * @return
+	 * 论文收藏  列表显示
+	 * @param pageNo 当前页面  默认1
+	 * @param pageSize 每页记录条数  默认3
+	 * @param request
+	 * @return List<Paper>
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
+	@RequestMapping(value = "/collect_list", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
 	public String collectPaperList(@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
-			@RequestParam(value = "pageSize",required = false,defaultValue = "5") int pageSize,HttpServletRequest request) {
+			@RequestParam(value = "pageSize",required = false,defaultValue = "3") int pageSize,HttpServletRequest request) {
 		
 		String header = request.getHeader("X-Token");
 		User user = tokenUtil.getUser(header);

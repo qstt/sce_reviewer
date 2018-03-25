@@ -1,5 +1,8 @@
 package ustc.sce.domain;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 论文：论文包含文件
  * @author 秋色天堂
@@ -16,35 +19,65 @@ public class Paper {
 	//论文是否公开     不公开只能论文上传者也就是用户自己看到
 	private boolean ispublic;
 	
+	private PaperReview paperReview;
+	
+	private Set<User> users = new HashSet<User>();
+
 	public int getId() {
 		return id;
 	}
+
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public String getPaperTitle() {
 		return paperTitle;
 	}
+
 	public void setPaperTitle(String paperTitle) {
 		this.paperTitle = paperTitle;
 	}
+
 	public String getPaperAuthor() {
 		return paperAuthor;
 	}
+
 	public void setPaperAuthor(String paperAuthor) {
 		this.paperAuthor = paperAuthor;
 	}
+
 	public String getPaperOwner() {
 		return paperOwner;
 	}
+
 	public void setPaperOwner(String paperOwner) {
 		this.paperOwner = paperOwner;
 	}
+
 	public boolean isIspublic() {
 		return ispublic;
 	}
+
 	public void setIspublic(boolean ispublic) {
 		this.ispublic = ispublic;
 	}
+
+	public PaperReview getPaperReview() {
+		return paperReview;
+	}
+
+	public void setPaperReview(PaperReview paperReview) {
+		this.paperReview = paperReview;
+	}
+
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+
 	
 }

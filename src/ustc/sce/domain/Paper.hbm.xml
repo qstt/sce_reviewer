@@ -14,6 +14,18 @@
 		<property name="paperOwner" column="paperOwner"/>
 		<property name="ispublic" column="ispublic"/>
 		
+		<one-to-one name="paperReview" property-ref="paper"></one-to-one>
+		
+		<set name="users" table="collect" cascade="save-update" lazy="false">
+			<!-- 当前对象在中间表的外键的名称 -->
+			<key column="paperId"/>
+			
+				<!-- class	集合中存入对象，对象的全路径
+				column	集合中对象在中间表的外键的名称 -->
+			
+			<many-to-many class="ustc.sce.domain.User" column="userId"/>
+		</set>
+		
 	</class>
 	
 </hibernate-mapping>
