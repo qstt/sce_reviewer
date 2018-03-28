@@ -1,5 +1,6 @@
 package ustc.sce.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -53,17 +54,20 @@ public class PublicPaperController {
 	
 	/**
 	 * 公开论文 根据论文题目进行查找
-	 * @param keyWords 查找关键字
-	 * @param pageNo 当前页面
-	 * @param pageSize 每页记录条数
+	 * @param keyWords 查找关键字 
+	 * @param pageNo 当前页面    默认为1
+	 * @param pageSize 每页记录条数  默认为3
 	 * @return List<Paper>
+	 * @throws UnsupportedEncodingException 
 	 */
 	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
 	public String publicPaperSearch(@RequestParam("keyWords") String keyWords,
 			@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
-			@RequestParam(value = "pageSize",required = false,defaultValue = "5")int pageSize) {
+			@RequestParam(value = "pageSize",required = false,defaultValue = "3")int pageSize) throws UnsupportedEncodingException {
 		
-		Page page = publicPaperService.publicPaperSearch(keyWords,Integer.valueOf(pageNo), pageSize);
+		String keyWords1=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
+		
+		Page page = publicPaperService.publicPaperSearch(keyWords1,Integer.valueOf(pageNo), pageSize);
 		List<Paper> paper = page.getList();
 		if (!paper.isEmpty()) {
 			return JSON.toJSONString(new Response().success(paper));

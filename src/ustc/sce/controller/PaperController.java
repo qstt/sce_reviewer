@@ -40,41 +40,22 @@ public class PaperController {
 	private TokenUtil tokenUtil;
 
 	/**
-	 * 创建论文   论文中的pdf文件是先上传成功的  传入之前的pdf文件的id  一个论文可以有多个pdf文件
-	 * @param paperTitle 论文题目
-	 * @param paperAuthor 论文作者
-	 * @param paperOwner 论文所有者 可以不提供
-	 * @param ispublic 公开/私有
-	 * @param fileId 关联文件id 默认不关联
-	 * @return 论文信息
-	 * @throws UnsupportedEncodingException 
-	 */
-	@RequestMapping(value = "/create", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
-	public String createPaper(@RequestParam("paperTitle") String paperTitle,
-			@RequestParam("paperAuthor") String paperAuthor, 
-			@RequestParam(value = "paperOwner",required = false) String paperOwner,
-			@RequestParam("ispublic") boolean ispublic, 
-			@RequestParam(value = "fileId",required = false,defaultValue = "-1") Integer fileId) throws UnsupportedEncodingException {
-		
-		String paperTitle1=new String(paperTitle.getBytes("iso-8859-1"), "utf-8");
-
-		PaperReview paperReview = paperService.createPaper(paperTitle1, paperAuthor, paperOwner, ispublic, fileId);
-			
-		return JSON.toJSONString(new Response().success(paperReview));
-	}
-	
-	/**
 	 * 创建论文
 	 * @param paper 论文实体
-	 * @param request
+	 * @param request 获得用户
+	 * @param fileId 所关联文件id
 	 * @return 论文信息
 	 */
-	@RequestMapping(value = "/create1", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
-	public String createPaper(@RequestBody Paper paper,HttpServletRequest request) {
+	@RequestMapping(value = "/create", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
+	public String createPaper(@RequestBody Paper paper,HttpServletRequest request,
+			@RequestParam(value = "fileId",required = false,defaultValue = "-1") Integer fileId) {
+		
+//		String paperTitle1=new String(paperTitle.getBytes("iso-8859-1"), "utf-8");
+		
 		String header = request.getHeader("X-Token");
 		User user = tokenUtil.getUser(header);
 		paper.setPaperOwner(user.getUserName());
-		PaperReview paperReview = paperService.savePaper(paper);
+		PaperReview paperReview = paperService.createPaper(paper,fileId);
 		
 		return JSON.toJSONString(new Response().success(paperReview));
 		
@@ -155,7 +136,6 @@ public class PaperController {
 		return JSON.toJSONString(new Response().failure("Search Failure..."));
 		
 	}
-	
 	
 	
 

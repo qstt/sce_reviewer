@@ -29,21 +29,14 @@ public class PaperDaoImp extends HibernateDaoSupport implements PaperDao {
 		this.pageUtil = pageUtil;
 	}
 
+
 	/**
 	 * 创建论文
 	 */
-	public PaperReview createPaper(String paperTitle, String paperAuthor, String paperOwner, boolean ispublic,
-			int fileId) {
-
-		Paper paper = new Paper();
-		FileEntity fileEntity = new FileEntity();
+	public PaperReview createPaper(Paper paper, Integer fileId) {
 		PaperReview paperReview = new PaperReview();
+		FileEntity fileEntity = new FileEntity();
 
-		// 保存论文
-		paper.setPaperTitle(paperTitle);
-		paper.setPaperAuthor(paperAuthor);
-		paper.setPaperOwner(paperOwner);
-		paper.setIspublic(ispublic);
 		this.getHibernateTemplate().save(paper);
 
 		// 将论文关联到文件中
@@ -62,7 +55,7 @@ public class PaperDaoImp extends HibernateDaoSupport implements PaperDao {
 
 		return paperReview;
 	}
-
+	
 	/**
 	 * 给论文增加文件
 	 */
@@ -164,19 +157,7 @@ public class PaperDaoImp extends HibernateDaoSupport implements PaperDao {
 		return page;
 	}
 
-	/**
-	 * 保存论文
-	 */
-	public PaperReview savePaper(Paper paper) {
-		PaperReview paperReview = new PaperReview();
-		
-		this.getHibernateTemplate().save(paper);
-		// 将论文关联到论文评阅中
-		paperReview.setPaperStatus(0);
-		paperReview.setPaper(paper);
-		this.getHibernateTemplate().save(paperReview);
 
-		return paperReview;
-	}
+	
 
 }

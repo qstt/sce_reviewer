@@ -26,9 +26,8 @@ public class PaperServiceImp implements PaperService {
 	/**
 	 * 创建论文
 	 */
-	public PaperReview createPaper(String paperTitle, String paperAuthor, String paperOwner, boolean ispublic,
-			int fileId) {
-		return paperDao.createPaper(paperTitle, paperAuthor, paperOwner, ispublic, fileId);
+	public PaperReview createPaper(Paper paper, Integer fileId) {
+		return paperDao.createPaper(paper,fileId);
 	}
 	
 	/**
@@ -59,11 +58,6 @@ public class PaperServiceImp implements PaperService {
 		return paperDao.paperSearch(keyWords,currentPage,pageSize,ispublic);
 	}
 
-	/**
-	 * 保存论文
-	 */
-	public PaperReview savePaper(Paper paper) {
-		return paperDao.savePaper(paper);
-	}
+	
 
 }

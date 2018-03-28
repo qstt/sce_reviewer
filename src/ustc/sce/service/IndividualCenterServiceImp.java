@@ -26,4 +26,18 @@ public class IndividualCenterServiceImp implements IndividualCenterService {
 		return individualCenterDao.getForPage(user,currentPage, pageSize);
 	}
 
+	/**
+	 * 取消收藏
+	 */
+	public boolean cancelCollection(User user, int paperId) {
+		return individualCenterDao.cancelCollection(user,paperId);
+	}
+
+	/**
+	 * 收藏论文   根据论文题目进行查找
+	 */
+	public Page searchCollection(User user, String keyWords, int currentPage, int pageSize) {
+		return individualCenterDao.searchCollection(user,keyWords,currentPage, pageSize);
+	}
+
 }

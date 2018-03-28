@@ -11,13 +11,14 @@
 		
 		<property name="annotationSelect" column="annotationSelect"/>
 		<property name="annotationContent" column="annotationContent"/>
+		<property name="annotator" column="annotator"/>
 		
 		<!-- 配置多方 
 			name	当前JavaBean中的属性
 			class	属性的全路径
 			column	外键的字段
 		-->
-		<many-to-one name="file" class="ustc.sce.domain.FileEntity" column="fileId" cascade="save-update"/>
+		<many-to-one name="file" class="ustc.sce.domain.FileEntity" column="fileId" cascade="save-update" lazy="false"/>
 		<!-- <many-to-one name="user" class="ustc.sce.domain.User" column="userId" cascade="save-update"/> -->
 		
 	</class>

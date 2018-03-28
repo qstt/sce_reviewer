@@ -46,7 +46,7 @@ public class FileServiceImp implements FileService {
 	}
 	
 	/**
-	 * 获取该用户当前页面信息
+	 * 分页显示该用户上传的文件
 	 */
 	public Page getForPage(int currentPage, int pageSize, User user) {
 		return fileDao.getForPage(currentPage, pageSize,user);

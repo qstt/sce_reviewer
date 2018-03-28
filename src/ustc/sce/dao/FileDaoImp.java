@@ -65,12 +65,12 @@ public class FileDaoImp extends HibernateDaoSupport implements FileDao {
 	}
 	
 	/**
-	 * 获取当前页面信息
+	 * 分页显示该用户上传的文件
 	 */
 	public Page getForPage(int currentPage, int pageSize, User user) {
 		int userId = user.getId();
 		String hql1 = "SELECT COUNT(*) from FileEntity as file inner join file.user as u where u.id='"+userId+"'";
-		String hql2="from FileEntity";
+		String hql2="from FileEntity as file inner join fetch file.user as u where u.id='"+userId+"'";
 		Page page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
 		return page;
 	}

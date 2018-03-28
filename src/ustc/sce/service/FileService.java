@@ -37,11 +37,11 @@ public interface FileService {
 	FileEntity getFile(int fileId);
 	
 	/**
-	 * 获取该用户当前页面数据
-	 * @param currentPage  当前页面
-	 * @param pageSize  页面显示记录条数
-	 * @param user  用户
-	 * @return  当前页面信息
+	 * 分页显示该用户上传的文件
+	 * @param pageNo 当前页面  默认1
+	 * @param pageSize 每页显示记录条数  默认3
+	 * @param request
+	 * @return List<FileEntity>
 	 */
 	Page getForPage(int currentPage, int pageSize, User user);
 	

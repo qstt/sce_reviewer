@@ -1,5 +1,6 @@
 package ustc.sce.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -44,7 +45,7 @@ public class IndividualCenterController {
 	 * @param request
 	 * @return List<Paper>
 	 */
-	@RequestMapping(value = "/collect_list", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
+	@RequestMapping(value = "/collect_list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
 	public String collectPaperList(@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize",required = false,defaultValue = "3") int pageSize,HttpServletRequest request) {
 		
@@ -60,4 +61,56 @@ public class IndividualCenterController {
 		
 	}
 
+	/**
+	 * 取消收藏
+	 * @param paperId 论文id
+	 * @param request 获得用户
+	 * @return 取消收藏成功/失败
+	 */
+	@RequestMapping(value = "/cancel", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String cancelCollection(@RequestParam("paperId") int paperId,HttpServletRequest request) {
+		String header = request.getHeader("X-Token");
+		User user = tokenUtil.getUser(header);
+		
+		boolean flag = individualCenterService.cancelCollection(user,paperId);
+		if (flag) {
+			return JSON.toJSONString(new Response().success("cancelCollection Success ..."));
+		}
+		return JSON.toJSONString(new Response().failure("cancelCollection Failure..."));
+	}
+	
+	/**
+	 * 收藏论文   根据论文题目进行查找
+	 * @param keyWords 查找关键字
+	 * @param pageNo 当前页面   默认为1
+	 * @param pageSize 每页记录条数  默认为3
+	 * @param request  获取用户
+	 * @return List<Paper>
+	 * @throws UnsupportedEncodingException
+	 */
+	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String searchCollection(@RequestParam("keyWords") String keyWords,
+			@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
+			@RequestParam(value = "pageSize",required = false,defaultValue = "3")int pageSize,
+			HttpServletRequest request) throws UnsupportedEncodingException {
+				
+		String header = request.getHeader("X-Token");
+		User user = tokenUtil.getUser(header);
+		
+		String keyWords1=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
+		
+		int currentPage = Integer.valueOf(pageNo);
+		Page page = individualCenterService.searchCollection(user,keyWords1,currentPage, pageSize);
+		List<Paper> paper = page.getList();
+		if (!paper.isEmpty()) {
+			return JSON.toJSONString(new Response().success(paper));
+		}
+		return JSON.toJSONString(new Response().failure("Search Failure..."));
+	}
+	
+	
+	
+	
+	
+	
 }

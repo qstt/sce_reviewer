@@ -16,14 +16,12 @@ public interface PaperDao {
 	
 	/**
 	 * 创建论文
-	 * @param paperTitle 论文题目
-	 * @param paperAuthor 论文作者
-	 * @param paperOwner 论文所有者
-	 * @param ispublic 公开/私有
-	 * @param fileId 关联文件id
+	 * @param paper 论文实体
+	 * @param request 获得用户
+	 * @param fileId 所关联文件id
 	 * @return 论文信息
 	 */
-	PaperReview createPaper(String paperTitle, String paperAuthor, String paperOwner, boolean ispublic, int fileId);
+	PaperReview createPaper(Paper paper, Integer fileId);
 	
 	/**
 	 * 给论文增加文件
@@ -60,11 +58,6 @@ public interface PaperDao {
 	 */
 	Page paperSearch(String keyWords, int currentPage, int pageSize, int ispublic);
 
-	/**
-	 * 保存论文
-	 * @param paper 论文实体
-	 * @return 论文信息
-	 */
-	PaperReview savePaper(Paper paper);
+	
 
 }

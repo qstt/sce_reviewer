@@ -93,12 +93,31 @@ public class UserController {
 	 * @param response 将token加入到cookie中
 	 * @return token user role
 	 */
-	@RequestMapping(value = "/login", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
+	@RequestMapping(value = "/login1", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
 	public String login(@RequestBody User user,HttpServletResponse response) {
 		String userName = user.getUserName();
 		String userPassword = user.getUserPassword();
 		
 		user = userService.login(userName, userPassword);
+		if (user != null) {
+			Token token = tokenManager.createToken(userName);
+			String token3 = token.getToken();
+			Cookie cookie = new Cookie("X-Token", token3);
+			response.addCookie(cookie);
+			
+			UserToken userToken = new UserToken();
+			userToken.setTokn(token);
+			userToken.setUser(user);
+			
+			return JSON.toJSONString(new Response().success(userToken));
+		}
+		return JSON.toJSONString(new Response().failure("Login Failure..."));
+	}
+	
+	@RequestMapping(value = "/login", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
+	public String login(@RequestParam("userName") String userName,@RequestParam("userPassword") String userPassword,HttpServletResponse response) {
+		
+		User user = userService.login(userName, userPassword);
 		if (user != null) {
 			Token token = tokenManager.createToken(userName);
 			String token3 = token.getToken();
