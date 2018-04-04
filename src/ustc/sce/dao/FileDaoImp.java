@@ -46,7 +46,9 @@ public class FileDaoImp extends HibernateDaoSupport implements FileDao {
         	path = request.getSession().getServletContext().getRealPath("\\") + path;  //相对路径用
         	File file = new File(path);
         	this.getHibernateTemplate().delete(fileEntity);
-        	file.delete();
+        	if (file.exists()) {
+				file.delete();
+			}
             return true;
         }
             return false;

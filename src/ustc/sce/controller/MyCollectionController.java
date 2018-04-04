@@ -22,7 +22,7 @@ import ustc.sce.service.IndividualCenterService;
 import ustc.sce.utils.TokenUtil;
 
 /**
- * 个人中心控制层   我的论文  我的批注  我的收藏
+ * 收藏控制层
  * @author 秋色天堂
  *
  */

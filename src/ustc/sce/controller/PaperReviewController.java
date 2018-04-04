@@ -1,12 +1,12 @@
 package ustc.sce.controller;
 
+import java.util.List;
+
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSON;
@@ -24,7 +24,7 @@ import ustc.sce.utils.TokenUtil;
  *
  */
 @RestController
-@RequestMapping("/paper-review")
+@RequestMapping("/paper_review")
 public class PaperReviewController {
 	
 	@Resource(name="paperReviewService")
@@ -38,7 +38,7 @@ public class PaperReviewController {
 	 * @param paperTitle
 	 * @return
 	 */
-	@RequestMapping(value = "/submit_paper/{paperId}/{teacherId}",method = RequestMethod.POST)
+	@RequestMapping(value = "/submit_paper/{paperId}/{teacherId}",method = RequestMethod.GET,produces="text/html;charset=utf-8")
 	public String submitPaper(@PathVariable("paperId") int paperId,@PathVariable("teacherId") int teacherId) {
 		
 		PaperReview paperReview = paperReviewService.submitPaper(paperId,teacherId);
@@ -49,8 +49,43 @@ public class PaperReviewController {
 		return JSON.toJSONString(new Response().failure("Submit Paper Failure..."));
 	}
 	
+	/**
+	 * 获取所有注册的老师
+	 * @return
+	 */
+	@RequestMapping(value = "/teachers",method = RequestMethod.GET,produces="text/html;charset=utf-8")
+	public String getTeachers() {
+		List<User> teachers = paperReviewService.getTeachers();
+		if (teachers != null) {
+			return JSON.toJSONString(new Response().success(teachers));
+		}
+		return JSON.toJSONString(new Response().failure("没有老师..."));
+	}
 	
+	/**
+	 * 评审中老师和学生的交互
+	 * @param paperId
+	 * @param teacherStatus
+	 * @return
+	 */
+	@RequestMapping(value = "/reviewing/{paperId}/{teacherStatus}",method = RequestMethod.GET,produces="text/html;charset=utf-8")
+	public String reviewing(@PathVariable("paperId") int paperId,@PathVariable("teacherStatus") int teacherStatus) {
+		
+		PaperReview paperReview = paperReviewService.reviewing(paperId,teacherStatus);
+		if (paperReview != null) {
+			return JSON.toJSONString(new Response().success(paperReview));
+		}
+		return JSON.toJSONString(new Response().failure("Submit Paper Failure..."));
+	}
 	
+	@RequestMapping(value = "/final_version/{paperId}",method = RequestMethod.GET,produces="text/html;charset=utf-8")
+	public String finalVersion(@PathVariable("paperId") int paperId) {
+		PaperReview paperReview = paperReviewService.finalVersion(paperId);
+		if (paperReview != null) {
+			return JSON.toJSONString(new Response().success(paperReview));
+		}
+		return JSON.toJSONString(new Response().failure("Submit Paper Failure..."));
+	}
 	
 
 }

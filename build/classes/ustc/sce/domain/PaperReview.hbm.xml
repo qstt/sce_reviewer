@@ -18,7 +18,7 @@
 			column	外键的字段
 		-->
 		<many-to-one name="paper" class="ustc.sce.domain.Paper" column="paperId" cascade="save-update" unique="true" lazy="false"/>
-		<many-to-one name="user" class="ustc.sce.domain.User" column="teacherId"/>
+		<many-to-one name="user" class="ustc.sce.domain.User" column="teacherId" lazy="false"/>
 		
 	</class>
 	
