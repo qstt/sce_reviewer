@@ -12,6 +12,7 @@
 		<property name="fileName" column="fileName"/>
 		<property name="fileType" column="fileType"/>
 		<property name="filePath" column="filePath"/>
+		<property name="createTime" column="createTime"/>
 		
 		<!-- 配置多方 
 			name	当前JavaBean中的属性

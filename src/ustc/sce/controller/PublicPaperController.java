@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,7 +22,7 @@ import ustc.sce.service.PublicPaperService;
 import ustc.sce.utils.TokenUtil;
 
 /**
- * 公开论文  列表 查找 收藏
+ * 公开论文控制层  列表 查找 收藏
  * @author 秋色天堂
  *
  */
@@ -47,7 +48,7 @@ public class PublicPaperController {
 		Page page = publicPaperService.getForPage(Integer.valueOf(pageNo), pageSize);
 		List<Paper> paper = page.getList();
 		if (!paper.isEmpty()) {
-			return JSON.toJSONString(new Response().success(paper));
+			return JSON.toJSONString(new Response().success(page));
 		}
 		return JSON.toJSONString(new Response().failure("List Failure..."));
 	}
@@ -65,12 +66,15 @@ public class PublicPaperController {
 			@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize",required = false,defaultValue = "3")int pageSize) throws UnsupportedEncodingException {
 		
-		String keyWords1=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
+		keyWords=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
+		if(keyWords.isEmpty()) {
+			return JSON.toJSONString(new Response().failure("请输论文名..."));
+		}
 		
-		Page page = publicPaperService.publicPaperSearch(keyWords1,Integer.valueOf(pageNo), pageSize);
+		Page page = publicPaperService.publicPaperSearch(keyWords,Integer.valueOf(pageNo), pageSize);
 		List<Paper> paper = page.getList();
 		if (!paper.isEmpty()) {
-			return JSON.toJSONString(new Response().success(paper));
+			return JSON.toJSONString(new Response().success(page));
 		}
 		return JSON.toJSONString(new Response().failure("Search Failure..."));
 	}
@@ -81,8 +85,8 @@ public class PublicPaperController {
 	 * @param request
 	 * @return 论文信息
 	 */
-	@RequestMapping(value = "/collect", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String publicPaperCollect(@RequestParam("paperId") int paperId, HttpServletRequest request) {
+	@RequestMapping(value = "/collect/{paperId}", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String publicPaperCollect(@PathVariable("paperId") int paperId, HttpServletRequest request) {
 		
 		String header = request.getHeader("X-Token");
 		User user = tokenUtil.getUser(header);

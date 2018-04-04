@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ustc.sce.dao.AnnotationDao;
 import ustc.sce.domain.Annotation;
+import ustc.sce.domain.FileEntity;
 import ustc.sce.domain.Page;
 import ustc.sce.domain.User;
 
@@ -37,20 +38,6 @@ public class AnnotationServiceImp implements AnnotationService {
 	}
 
 	/**
-	 * 分页显示该用户批注
-	 */
-	public Page getForPage(User user, int currentPage, int pageSize) {
-		return annotationDao.getForPage(user,currentPage,pageSize);
-	}
-
-	/**
-	 * 分页显示该用户批注查找
-	 */
-	public Page userAnnotationSearch(User user, String keyWords1, int currentPage, int pageSize) {
-		return annotationDao.userAnnotationSearch(user,keyWords1,currentPage,pageSize);
-	}
-
-	/**
 	 * 不分页显示改文件所有批注
 	 */
 	public List<Annotation> fileAnnotationList(int fileId) {
@@ -62,6 +49,28 @@ public class AnnotationServiceImp implements AnnotationService {
 	 */
 	public List<Annotation> fileAnnotationSearch(int fileId, String keyWords) {
 		return annotationDao.fileAnnotationSearch(fileId,keyWords);
+	}
+
+	/**
+	 * 显示该文件该用户的所有批注
+	 */
+	public List<Annotation> userAnnotationList(User user, int fileId) {
+		return annotationDao.userAnnotationList(user,fileId);
+	}
+
+	@Override
+	public List<Annotation> userAnnotationSearch(User user, int fileId, String keyWords) {
+		return annotationDao.userAnnotationSearch(user,fileId,keyWords);
+	}
+
+	@Override
+	public List<FileEntity> myAnnotationList(User user) {
+		return annotationDao.myAnnotationList(user);
+	}
+
+	@Override
+	public boolean myAnnotationDelete(User user, int fileId) {
+		return annotationDao.myAnnotationDelete(user,fileId);
 	}
 
 }

@@ -26,6 +26,16 @@
 			<many-to-many class="ustc.sce.domain.User" column="userId"/>
 		</set>
 		
+		<set name="fileEntitys" inverse="true" lazy="false">
+			<!-- 当前对象在中间表的外键的名称 -->
+			<key column="paperId"/>
+			
+				<!-- class	集合中存入对象，对象的全路径
+				column	集合中对象在中间表的外键的名称 -->
+			
+			<one-to-many class="ustc.sce.domain.FileEntity"/>
+		</set>
+		
 	</class>
 	
 </hibernate-mapping>

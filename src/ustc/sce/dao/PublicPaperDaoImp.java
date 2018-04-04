@@ -9,6 +9,11 @@ import ustc.sce.domain.Paper;
 import ustc.sce.domain.User;
 import ustc.sce.utils.PageUtil;
 
+/**
+ * 公开论文持久层   列表 查找  接口
+ * @author 秋色天堂
+ *
+ */
 public class PublicPaperDaoImp extends HibernateDaoSupport implements PublicPaperDao {
 	
 	private PageUtil pageUtil;

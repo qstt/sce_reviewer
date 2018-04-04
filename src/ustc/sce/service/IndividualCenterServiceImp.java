@@ -40,4 +40,5 @@ public class IndividualCenterServiceImp implements IndividualCenterService {
 		return individualCenterDao.searchCollection(user,keyWords,currentPage, pageSize);
 	}
 
+
 }

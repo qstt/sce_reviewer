@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,10 +42,12 @@ public class UserController {
 	 * 检测用户是否已经注册
 	 * @param userName 注册时的用户名
 	 * @return  该用户是否已经注册
+	 * @throws UnsupportedEncodingException 
 	 */
-	@RequestMapping(value = "/check", method = RequestMethod.GET,produces="text/html;charset=utf-8")
-	public String checkUser(@RequestParam("userName") String userName) {
+	@RequestMapping(value = "/check/{userName}", method = RequestMethod.GET,produces="text/html;charset=utf-8")
+	public String checkUser(@PathVariable("userName") String userName) throws UnsupportedEncodingException {
 		
+		userName=new String(userName.getBytes("iso-8859-1"), "utf-8");
 		User user = userService.checkUser(userName);
 		if (user == null) {
 			return JSON.toJSONString(new Response().success("该用户没有注册..."));
@@ -56,11 +59,13 @@ public class UserController {
 	 * 获得用户角色   默认是学生
 	 * @return  数据库中所有的角色
 	 */
-	@RequestMapping(value = "/get_role", method = RequestMethod.GET,produces="text/html;charset=utf-8")
+	@RequestMapping(value = "/roles", method = RequestMethod.GET,produces="text/html;charset=utf-8")
 	public String getRole() {
 		
 		List<Role> roles = userService.getRole();
-		
+		if (roles == null) {
+			return JSON.toJSONString(new Response().failure("没有角色可选..."));
+		}
 		return JSON.toJSONString(new Response().success(roles));
 		
 	}
@@ -74,15 +79,9 @@ public class UserController {
 	@RequestMapping(value = "/register", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
 	public String register(@RequestBody User user) throws UnsupportedEncodingException {
 
-		String userName = user.getUserName();
-		String userPassword = user.getUserPassword();
-		String roleName = user.getRole().getRoleName();
-		
-		String roleName1=new String(roleName.getBytes("iso-8859-1"), "utf-8");
-		
-		boolean flag = userService.register(userName, userPassword, roleName1);
-		if (flag) {
-			return JSON.toJSONString(new Response().success("Register Success..."));
+		user = userService.register(user);
+		if (user != null) {
+			return JSON.toJSONString(new Response().success(user));
 		}
 		return JSON.toJSONString(new Response().failure("Register Failure..."));
 	}
@@ -93,7 +92,7 @@ public class UserController {
 	 * @param response 将token加入到cookie中
 	 * @return token user role
 	 */
-	@RequestMapping(value = "/login1", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
+	@RequestMapping(value = "/login", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
 	public String login(@RequestBody User user,HttpServletResponse response) {
 		String userName = user.getUserName();
 		String userPassword = user.getUserPassword();
@@ -114,33 +113,16 @@ public class UserController {
 		return JSON.toJSONString(new Response().failure("Login Failure..."));
 	}
 	
-	@RequestMapping(value = "/login", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
-	public String login(@RequestParam("userName") String userName,@RequestParam("userPassword") String userPassword,HttpServletResponse response) {
-		
-		User user = userService.login(userName, userPassword);
-		if (user != null) {
-			Token token = tokenManager.createToken(userName);
-			String token3 = token.getToken();
-			Cookie cookie = new Cookie("X-Token", token3);
-			response.addCookie(cookie);
-			
-			UserToken userToken = new UserToken();
-			userToken.setTokn(token);
-			userToken.setUser(user);
-			
-			return JSON.toJSONString(new Response().success(userToken));
-		}
-		return JSON.toJSONString(new Response().failure("Login Failure..."));
-	}
-
 	/**
 	 * 退出登录
 	 * @param userName 用户名
 	 * @return 退出成功或失败
+	 * @throws UnsupportedEncodingException 
 	 */
-	@RequestMapping(value = "/exit", method = RequestMethod.GET)
-	public String exit(@RequestParam("userName") String userName) {
+	@RequestMapping(value = "/exit/{userName}", method = RequestMethod.GET)
+	public String exit(@PathVariable("userName") String userName) throws UnsupportedEncodingException {
 		
+		userName=new String(userName.getBytes("iso-8859-1"), "utf-8");
 		boolean flag = userService.exit(userName);
 		if (flag) {
 			return JSON.toJSONString(new Response().success("Exit Success..."));

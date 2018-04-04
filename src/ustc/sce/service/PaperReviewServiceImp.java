@@ -14,20 +14,8 @@ public class PaperReviewServiceImp implements PaperReviewService {
 		this.paperReviewDao = paperReviewDao;
 	}
 
-
-	public PaperReview notReview(int paperStatus, int paperId,User user) {
-		
-		PaperReview paperReview = paperReviewDao.notReview(paperStatus,paperId,user);
-		
-		return paperReview;
-	}
-
-
-	public PaperReview changeReview(int paperStatus, String paperTitle) {
-
-		PaperReview paperReview = paperReviewDao.changeReview(paperStatus,paperTitle);
-		
-		return paperReview;
+	public PaperReview submitPaper(int paperId, int teacherId) {
+		return paperReviewDao.submitPaper(paperId,teacherId);
 	}
 
 }

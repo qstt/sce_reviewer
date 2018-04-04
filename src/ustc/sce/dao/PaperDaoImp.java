@@ -37,19 +37,23 @@ public class PaperDaoImp extends HibernateDaoSupport implements PaperDao {
 		PaperReview paperReview = new PaperReview();
 		FileEntity fileEntity = new FileEntity();
 
-		this.getHibernateTemplate().save(paper);
-
 		// 将论文关联到文件中
 		if (fileId != -1) {
 			String hql = "from FileEntity as file where file.id='" + fileId + "'";
 			List<FileEntity> list = (List<FileEntity>) getHibernateTemplate().find(hql);
-			fileEntity = list.get(0);
-			fileEntity.setPaper(paper);
-			this.getHibernateTemplate().update(fileEntity);
+			if( !list.isEmpty()) {
+				fileEntity = list.get(0);
+				fileEntity.setPaper(paper);
+				this.getHibernateTemplate().update(fileEntity);
+				paper.getFileEntitys().add(fileEntity);
+			}
 		}
 
+		this.getHibernateTemplate().save(paper);
+		
 		// 将论文关联到论文评阅中
 		paperReview.setPaperStatus(0);
+		paperReview.setTeacherStatus(0);
 		paperReview.setPaper(paper);
 		this.getHibernateTemplate().save(paperReview);
 
@@ -59,7 +63,7 @@ public class PaperDaoImp extends HibernateDaoSupport implements PaperDao {
 	/**
 	 * 给论文增加文件
 	 */
-	public FileEntity addPDF(int paperId, int fileId) {
+	public Paper addPDF(int paperId, int fileId) {
 		String hql = "from Paper as paper where paper.id='" + paperId + "'";
 		List<Paper> list = (List<Paper>) getHibernateTemplate().find(hql);
 
@@ -77,10 +81,12 @@ public class PaperDaoImp extends HibernateDaoSupport implements PaperDao {
 		FileEntity fileEntity = list1.get(0);
 
 		fileEntity.setPaper(paper);
+		paper.getFileEntitys().add(fileEntity);
 
 		this.getHibernateTemplate().update(fileEntity);
+		this.getHibernateTemplate().update(paper);
 
-		return fileEntity;
+		return paper;
 
 	}
 
@@ -134,28 +140,18 @@ public class PaperDaoImp extends HibernateDaoSupport implements PaperDao {
 	}
 
 	/**
-	 * 论文列表
+	 * 获取该论文所有文件
 	 */
-	public Page getForPage(int currentPage, int pageSize, int ispublic) {
-		String hql1 = "SELECT COUNT(*) FROM Paper where ispublic ='" + ispublic + "'";
-		String hql2 = "from Paper where ispublic ='" + ispublic + "'";
-
-		Page page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
-		return page;
+	public List<FileEntity> paperFile(int paperId) {
+		String hql = "from FileEntity as file inner join fetch file.paper as p where p.id='" + paperId + "'" +"order by file.createTime desc";
+		List<FileEntity> list = (List<FileEntity>) getHibernateTemplate().find(hql);
+		
+		if(list.isEmpty()) {
+			return null;
+		}
+		return list;
 	}
 
-	/**
-	 * 根据论文题目进行查询
-	 */
-	public Page paperSearch(String keyWords, int currentPage, int pageSize, int ispublic) {
-		String hql1 = "SELECT COUNT(*) FROM Paper where paperTitle like '" + "%" + keyWords + "%" + "'"
-				+ "and ispublic ='" + ispublic + "'";
-		String hql2 = "from Paper where paperTitle like '" + "%" + keyWords + "%" + "'" + "and ispublic ='" + ispublic
-				+ "'";
-
-		Page page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
-		return page;
-	}
 
 
 	

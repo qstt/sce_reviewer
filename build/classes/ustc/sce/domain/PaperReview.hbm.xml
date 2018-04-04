@@ -10,6 +10,7 @@
 		</id>
 		
 		<property name="paperStatus" column="paperStatus"/>
+		<property name="teacherStatus" column="teacherStatus"/>
 		
 		<!-- 配置多方 
 			name	当前JavaBean中的属性
@@ -17,7 +18,7 @@
 			column	外键的字段
 		-->
 		<many-to-one name="paper" class="ustc.sce.domain.Paper" column="paperId" cascade="save-update" unique="true" lazy="false"/>
-		<many-to-one name="user" class="ustc.sce.domain.User" column="userId"/>
+		<many-to-one name="user" class="ustc.sce.domain.User" column="teacherId"/>
 		
 	</class>
 	

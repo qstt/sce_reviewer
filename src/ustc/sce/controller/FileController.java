@@ -2,8 +2,10 @@ package ustc.sce.controller;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -99,6 +102,8 @@ public class FileController {
 			fileUpload.setFileType(extensionName);
 			fileUpload.setFilePath(filePath1);
 			fileUpload.setUser(user);
+//			fileUpload.setCreateTime(new Timestamp(System.currentTimeMillis()));
+//			fileUpload.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 
 			fileService.FileSave(fileUpload);
 			// 直接返回file的JSON格式，只有txt文件可以上传成功，
@@ -115,8 +120,8 @@ public class FileController {
 	 * @param request
 	 * @return 删除成功/失败
 	 */
-	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public String fileDelete(@RequestParam("fileId") int fileId,HttpServletRequest request) {
+	@RequestMapping(value = "/delete/{fileId}", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
+	public String fileDelete(@PathVariable("fileId") int fileId,HttpServletRequest request) {
 		boolean flag = fileService.fileDelete(fileId,request);
 		if (flag) {
 			return JSON.toJSONString(new Response().success("FileDelect Success..."));
@@ -131,8 +136,8 @@ public class FileController {
 	 * @param request
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/download",method = RequestMethod.GET)
-	public void fileDownload(@RequestParam("fileId") int fileId, HttpServletResponse response,HttpServletRequest request)
+	@RequestMapping(value = "/download/{fileId}",method = RequestMethod.GET,produces = "text/html;charset=utf-8")
+	public void fileDownload(@PathVariable("fileId") int fileId, HttpServletResponse response,HttpServletRequest request)
 			throws IOException {
 
 		// 得到filePath 拼接真实路径
@@ -164,7 +169,7 @@ public class FileController {
 	 * @param pageNo 当前页面  默认1
 	 * @param pageSize 每页显示记录条数  默认3
 	 * @param request
-	 * @return List<FileEntity>
+	 * @return page
 	 */
 	@RequestMapping(value = "/user_list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
 	public String fileUserList(@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
@@ -182,7 +187,7 @@ public class FileController {
 				filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
 				pageFileEntity.get(i).setFilePath(filePath);
 			}
-			return JSON.toJSONString(new Response().success(pageFileEntity));
+			return JSON.toJSONString(new Response().success(page));
 		}
 		return JSON.toJSONString(new Response().failure("FileList Failure..."));
 
@@ -191,7 +196,7 @@ public class FileController {
 	/**
 	 * 不分页显示该用户上传的文件
 	 * @param request
-	 * @return  List<FileEntity>
+	 * @return  page
 	 */
 	@RequestMapping(value = "/nopage_list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
 	public String fileNoPageList(HttpServletRequest request) {
@@ -199,6 +204,9 @@ public class FileController {
 		User user = tokenUtil.getUser(header);
 		
 		List<FileEntity> fileEntitys = fileService.fileNoPageList(user);
+		if(fileEntitys == null) {
+			return JSON.toJSONString(new Response().failure("该用户没有上传的文件..."));
+		}
 		
 		return JSON.toJSONString(new Response().success(fileEntitys));
 	}
@@ -224,7 +232,7 @@ public class FileController {
 				filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
 				pageFileEntity.get(i).setFilePath(filePath);
 			}
-			return JSON.toJSONString(new Response().success(pageFileEntity));
+			return JSON.toJSONString(new Response().success(page));
 		}
 		return JSON.toJSONString(new Response().failure("FileList Failure..."));
 
@@ -235,15 +243,24 @@ public class FileController {
 	 * @param fileId  文件id
 	 * @param request
 	 * @return file 使用filePath
+	 * @throws Exception 
 	 */
-	@RequestMapping(value = "/show", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String fileShow(@RequestParam("fileId") int fileId,HttpServletRequest request) {
+	@RequestMapping(value = "/show/{fileId}", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileShow(@PathVariable("fileId") int fileId,HttpServletRequest request,HttpServletResponse response) throws Exception {
 		FileEntity file = fileService.getFile(fileId);
 		if (file != null) {
 			String filePath = file.getFilePath();
 			filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
+			File file2 = new File(filePath);
+			byte[] data = null;
+			FileInputStream input = new FileInputStream(file2);
+            data = new byte[input.available()];
+            input.read(data);
+            response.getOutputStream().write(data);
 			file.setFilePath(filePath);
-			return JSON.toJSONString(new Response().success(file));
+			return null;
+			
+//			return JSON.toJSONString(new Response().success(file));
 		}
 		return JSON.toJSONString(new Response().failure("fileShow Failure..."));
 
@@ -256,15 +273,20 @@ public class FileController {
 	 * @param pageSize 每页显示记录条数
 	 * @param request
 	 * @return List<FileEntity>
+	 * @throws UnsupportedEncodingException 
 	 */
 	@RequestMapping(value = "/all_search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String fileAllSearch(@RequestParam("keyWords") String keyWords,
+	public String fileAllSearch(@RequestParam(value = "keyWords") String keyWords,
 			@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "3") int pageSize,
-			HttpServletRequest request) {
-
-		int currentPage = Integer.valueOf(pageNo);
+			HttpServletRequest request) throws UnsupportedEncodingException {
 		
+		keyWords=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
+		if(keyWords.isEmpty()) {
+			return JSON.toJSONString(new Response().failure("请输入文件名..."));
+		}
+		
+		int currentPage = Integer.valueOf(pageNo);
 		Page page = fileService.getForPage(currentPage, pageSize,keyWords);
 		List<FileEntity> pageFileEntity = page.getList();
 		if (!pageFileEntity.isEmpty()) {
@@ -273,7 +295,7 @@ public class FileController {
 				filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
 				pageFileEntity.get(i).setFilePath(filePath);
 			}
-			return JSON.toJSONString(new Response().success(pageFileEntity));
+			return JSON.toJSONString(new Response().success(page));
 		}
 		return JSON.toJSONString(new Response().failure("FileList Failure..."));
 
@@ -284,15 +306,25 @@ public class FileController {
 	 * @param keyWords 查询关键字
 	 * @param request
 	 * @return List<FileEntity>
+	 * @throws UnsupportedEncodingException 
 	 */
 	@RequestMapping(value = "/user_search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String fileUserSearch(@RequestParam("keyWords") String keyWords,HttpServletRequest request) {
+	public String fileUserSearch(@RequestParam("keyWords") String keyWords,HttpServletRequest request) throws UnsupportedEncodingException {
 		String header = request.getHeader("X-Token");
 		User user = tokenUtil.getUser(header);
 		
+		if(keyWords.isEmpty()) {
+			return JSON.toJSONString(new Response().failure("请输入文件名..."));
+		}
+		
+		keyWords=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
 		List<FileEntity> fileEntitys = fileService.fileNoPageList(user,keyWords);
-		   
-		return JSON.toJSONString(new Response().success(fileEntitys));
+		
+		if(fileEntitys == null) {
+			return JSON.toJSONString(new Response().failure("没有该文件..."));
+		}
+		
+		return JSON.toJSONString(new Response().success(fileEntitys));   
 		
 	}
 	

@@ -17,45 +17,25 @@ public class PaperReviewDaoImp extends HibernateDaoSupport implements PaperRevie
 
 	private TokenUtil tokenUtil = new TokenUtil();
 	
-	public PaperReview notReview(int paperStatus, int paperId,User user) {
-
-		PaperReview paperReview = new PaperReview();
+	public PaperReview submitPaper(int paperId,int teacherId) {
 		
-		String hql="from Paper as paper where paper.id='"+paperId+"'";
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-        Query query =session.createQuery(hql);
-        List<Paper> list = query.list();
-        Paper paper = list.get(0);
+		String hql = "from PaperReview as pr inner join fetch pr.paper as p where f.id='" + paperId + "'";
+		List<PaperReview> list = (List<PaperReview>) this.getHibernateTemplate().find(hql);
+		String hql1="from User as user where user.id='" + teacherId +"'";
+		List<User> list1 = (List<User>) this.getHibernateTemplate().find(hql1);
 		
-		paperReview.setPaperStatus(paperStatus);
-		paperReview.setPaper(paper);
-		paperReview.setUser(user);
+		if(list.isEmpty() || list1.isEmpty()) {
+			return null;
+		}
 		
-		this.getHibernateTemplate().getSessionFactory().getCurrentSession().save(paperReview);
-
-		return paperReview;
-	}
-
-	public PaperReview changeReview(int paperStatus, String paperTitle) {
-
-		String hql = "from Paper where paperTitle='" + paperTitle + "'";
-		Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
-		Query query = session.createQuery(hql);
-		List<Paper> list = query.list();
-
-		int paperId = list.get(0).getId();
-		System.out.println(paperId);
-
-		String hql1 = "from PaperReview where paperId='" + paperId + "'";
-		Session session1 = getHibernateTemplate().getSessionFactory().getCurrentSession();
-		Query query1 = session1.createQuery(hql1);
-		List<PaperReview> list1 = query1.list();
-
-		PaperReview paperReview = list1.get(0);
-		paperReview.setPaperStatus(paperStatus);
-
-		this.getHibernateTemplate().getSessionFactory().getCurrentSession().update(paperReview);
-
+		PaperReview paperReview = list.get(0);
+		User teacher = list1.get(0);
+		paperReview.setPaperStatus(1);
+		paperReview.setTeacherStatus(1);
+		paperReview.setUser(teacher);  
+		
+		this.getHibernateTemplate().update(paperReview);
+		
 		return paperReview;
 	}
 

@@ -82,7 +82,9 @@ public class FileDaoImp extends HibernateDaoSupport implements FileDao {
 		int userId = user.getId();
 		String hql = "from FileEntity as file inner join file.user as u where u.id='"+userId+"'";
 		List<FileEntity> list = (List<FileEntity>) this.getHibernateTemplate().find(hql);
-		
+		if(list.isEmpty()) {
+			return null;
+		}
 		return list;
 	}
 	
@@ -116,6 +118,9 @@ public class FileDaoImp extends HibernateDaoSupport implements FileDao {
 		int userId = user.getId();
 		String hql = "from FileEntity as file inner join file.user as u where u.id='"+userId+"'" + "and fileName like '"+ "%" + keyWords + "%" +"'";
 		List<FileEntity> list = (List<FileEntity>) this.getHibernateTemplate().find(hql);
+		if(list.isEmpty()) {
+			return null;
+		}
 		
 		return list;
 	}

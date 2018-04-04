@@ -30,7 +30,7 @@ public interface UserDao {
 	 * @param roleName 角色
 	 * @return boolean 注册是否成功
 	 */
-	public boolean register(String userName, String userPassword, String roleName);
+	public User register(User user);
 
 	/**
 	 * 登录

@@ -1,5 +1,7 @@
 package ustc.sce.service;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import ustc.sce.domain.FileEntity;
@@ -29,7 +31,7 @@ public interface PaperService {
 	 * @param fileId 文件id
 	 * @return 文件信息
 	 */
-	FileEntity addPDF(int paperId, int fileId);
+	Paper addPDF(int paperId, int fileId);
 
 	/**
 	 * 删除论文 将论文中所有文件都删除
@@ -40,23 +42,12 @@ public interface PaperService {
 	boolean paperDelete(int paperId, HttpServletRequest request);
 
 	/**
-	 * 论文列表
-	 * @param currentPage  当前页面
-	 * @param pageSize 每页记录条数
-	 * @param ispublic 公开 1 /私有 0
-	 * @return 当前页面信息
+	 * 获取该论文所有文件
+	 * @param paperId 论文id
+	 * @return List<FileEntity>
 	 */
-	Page getForPage(int currentPage, int pageSize, int ispublic);
+	List<FileEntity> paperFile(int paperId);
 
-	/**
-	 * 根据论文题目进行查询
-	 * @param keyWords 查询关键字
-	 * @param pageNo 当前页面 默认为1
-	 * @param pageSize 每页记录条数 默认为3
-	 * @param ispublic 公开 1/私有 0
-	 * @return 当前页面信息
-	 */
-	Page paperSearch(String keyWords, int currentPage, int pageSize, int ispublic);
 
 
 }

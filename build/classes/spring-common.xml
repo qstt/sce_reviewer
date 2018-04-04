@@ -53,6 +53,7 @@
 				<value>ustc/sce/domain/PaperReview.hbm.xml</value>
 				<value>ustc/sce/domain/Paper.hbm.xml</value>
 				<value>ustc/sce/domain/Annotation.hbm.xml</value>
+				<value>ustc/sce/domain/PaperReview.hbm.xml</value>
 				
 			</list>
 		</property>
@@ -139,5 +140,14 @@
 		<property name="pageUtil" ref="pageUtil"></property>
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
-
+	
+	<!-- 我的论文 -->
+	<bean id="myPaperService" class="ustc.sce.service.MyPaperServiceImp">
+		<property name="myPaperDao" ref="myPaperDao"></property>
+	</bean>
+	
+	<bean id="myPaperDao" class="ustc.sce.dao.MyPaperDaoImp">
+		<property name="pageUtil" ref="pageUtil"></property>
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
 </beans>

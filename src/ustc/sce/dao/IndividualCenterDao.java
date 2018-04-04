@@ -39,4 +39,5 @@ public interface IndividualCenterDao {
 	 */
 	Page searchCollection(User user, String keyWords, int currentPage, int pageSize);
 
+
 }

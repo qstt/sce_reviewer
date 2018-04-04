@@ -1,11 +1,11 @@
 package ustc.sce.controller;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSON;
 
 import ustc.sce.domain.FileEntity;
-import ustc.sce.domain.Page;
 import ustc.sce.domain.Paper;
 import ustc.sce.domain.PaperReview;
 import ustc.sce.domain.User;
@@ -54,6 +53,7 @@ public class PaperController {
 		
 		String header = request.getHeader("X-Token");
 		User user = tokenUtil.getUser(header);
+		
 		paper.setPaperOwner(user.getUserName());
 		PaperReview paperReview = paperService.createPaper(paper,fileId);
 		
@@ -67,10 +67,13 @@ public class PaperController {
 	 * @param fileId 文件id
 	 * @return 文件信息
 	 */
-	@RequestMapping(value = "/addPDF", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
-	public String addPDF(@RequestParam("paperId") int paperId,@RequestParam("fileId") int fileId) {
-		FileEntity fileEntity = paperService.addPDF(paperId,fileId);
-		return JSON.toJSONString(new Response().success(fileEntity));
+	@RequestMapping(value = "/addPDF/{paperId}/{fileId}", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
+	public String addPDF(@PathVariable("paperId") int paperId,@PathVariable("fileId") int fileId) {
+		Paper paper = paperService.addPDF(paperId,fileId);
+		if(paper == null) {
+			return JSON.toJSONString(new Response().failure("addPDF Failure..."));
+		}
+		return JSON.toJSONString(new Response().success(paper));
 		
 	}
 	
@@ -80,8 +83,8 @@ public class PaperController {
 	 * @param request
 	 * @return 删除成功/失败
 	 */
-	@RequestMapping(value = "/delete", method = RequestMethod.GET)
-	public String paperDelete(@RequestParam("paperId") int paperId,HttpServletRequest request) {
+	@RequestMapping(value = "/delete/{paperId}", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
+	public String paperDelete(@PathVariable("paperId") int paperId,HttpServletRequest request) {
 		boolean flag = paperService.paperDelete(paperId,request);
 		if (flag) {
 			return JSON.toJSONString(new Response().success("paperDelete Success..."));
@@ -90,52 +93,26 @@ public class PaperController {
 	}
 	
 	/**
-	 * 论文列表
-	 * @param pageNo 当前页面 默认为1
-	 * @param pageSize 每页显示记录条数  默认为3
-	 * @param ispublic 公开/私有   公开 1  私有 0
-	 * @return List<Paper>
+	 * 获取该论文所有文件
+	 * @param paperId 论文id
+	 * @param request
+	 * @return List<FileEntity>
 	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String paperList(@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
-			@RequestParam(value = "pageSize",required = false,defaultValue = "3") int pageSize,
-			@RequestParam(value = "ispublic") int ispublic) {
-		
-		int currentPage = Integer.valueOf(pageNo);
-		
-		Page page = paperService.getForPage(currentPage, pageSize,ispublic);
-		List<Paper> paper = page.getList();
-		if (!paper.isEmpty()) {
-			return JSON.toJSONString(new Response().success(paper));
+	@RequestMapping(value = "/files/{paperId}", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
+	public String paperFile(@PathVariable("paperId") int paperId,HttpServletRequest request) {
+		List<FileEntity> fileEntity = paperService.paperFile(paperId);
+		if (!fileEntity.isEmpty()) {
+			for (int i = 0; i < fileEntity.size(); i++) {
+				String filePath = fileEntity.get(i).getFilePath();
+				filePath = request.getSession().getServletContext().getRealPath("\\") + filePath;
+				fileEntity.get(i).setFilePath(filePath);
+			}
+			return JSON.toJSONString(new Response().success(fileEntity));
 		}
-		return JSON.toJSONString(new Response().failure("List Failure..."));
+		return JSON.toJSONString(new Response().failure("paper no file ..."));
 		
 	}
 	
-	/**
-	 * 根据论文题目进行查询
-	 * @param keyWords 查询关键字
-	 * @param pageNo 当前页面 默认为1
-	 * @param pageSize 每页记录条数 默认为3
-	 * @param ispublic 公开 1/私有 0
-	 * @return List<Paper>
-	 */
-	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String paperSearch(@RequestParam("keyWords") String keyWords,
-			@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
-			@RequestParam(value = "pageSize",required = false,defaultValue = "3") int pageSize,
-			@RequestParam(value = "ispublic") int ispublic) {
-		
-		int currentPage = Integer.valueOf(pageNo);
-		
-		Page page = paperService.paperSearch(keyWords,currentPage, pageSize,ispublic);
-		List<Paper> paper = page.getList();
-		if (!paper.isEmpty()) {
-			return JSON.toJSONString(new Response().success(paper));
-		}
-		return JSON.toJSONString(new Response().failure("Search Failure..."));
-		
-	}
 	
 	
 

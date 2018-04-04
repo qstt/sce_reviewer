@@ -39,9 +39,11 @@ public class UserServiceImp implements UserService {
 	/**
 	 * 注册
 	 */
-	public boolean register(String userName, String userPassword, String roleName) {
+	public User register(User user) {
+		String userPassword = user.getUserPassword();
 		userPassword = MD5Utils.md5(userPassword);
-		return userDao.register(userName,userPassword,roleName);
+		user.setUserPassword(userPassword);
+		return userDao.register(user);
 	}
 
 	/**登录

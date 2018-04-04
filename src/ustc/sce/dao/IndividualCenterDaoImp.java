@@ -80,4 +80,5 @@ public class IndividualCenterDaoImp extends HibernateDaoSupport implements Indiv
 		return page;
 	}
 
+
 }

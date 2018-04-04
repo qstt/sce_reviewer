@@ -8,8 +8,11 @@ package ustc.sce.domain;
 public class Token {
 	
 	private int id;
+	//通过UUID产生的token
 	private String token;
+	//token 和该用户的用户名进行关联
 	private String userName;
+	
 	public int getId() {
 		return id;
 	}

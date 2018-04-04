@@ -7,6 +7,11 @@ import ustc.sce.domain.Page;
 import ustc.sce.domain.Paper;
 import ustc.sce.domain.User;
 
+/**
+ * 公开论文业务层   列表   查找  收藏
+ * @author 秋色天堂
+ *
+ */
 @Transactional
 public class PublicPaperServiceImp implements PublicPaperService {
 	

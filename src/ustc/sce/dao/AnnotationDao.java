@@ -1,9 +1,9 @@
 package ustc.sce.dao;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import ustc.sce.domain.Annotation;
+import ustc.sce.domain.FileEntity;
 import ustc.sce.domain.Page;
 import ustc.sce.domain.User;
 
@@ -30,25 +30,6 @@ public interface AnnotationDao {
 	boolean deleteAnnotation(User user, int annotationId);
 
 	/**
-	 * 分页显示该用户批注
-	 * @param pageNo 当前页面 默认1
-	 * @param pageSize 每页显示记录条数  默认3
-	 * @param request 获得该用户请求
-	 * @return List<Annotation>
-	 */
-	Page getForPage(User user, int currentPage, int pageSize);
-
-	/**
-	 * 分页显示该用户批注查找
-	 * @param keyWords 查找关键字
-	 * @param pageNo 当前页面  默认1
-	 * @param pageSize 每页显示记录条数 默认3
-	 * @param request 获取用户
-	 * @return List<Annotation>
-	 */
-	Page userAnnotationSearch(User user, String keyWords1, int currentPage, int pageSize);
-
-	/**
 	 * 不分页显示该文件所有批注
 	 * @param fileId 文件id
 	 * @return List<Annotation>
@@ -62,5 +43,19 @@ public interface AnnotationDao {
 	 * @return List<Annotation>
 	 */
 	List<Annotation> fileAnnotationSearch(int fileId, String keyWords);
+
+	/**
+	 * 显示该文件该用户的所有批注
+	 * @param user
+	 * @param fileId
+	 * @return
+	 */
+	List<Annotation> userAnnotationList(User user, int fileId);
+
+	List<Annotation> userAnnotationSearch(User user, int fileId, String keyWords);
+
+	List<FileEntity> myAnnotationList(User user);
+
+	boolean myAnnotationDelete(User user, int fileId);
 
 }

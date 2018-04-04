@@ -1,5 +1,7 @@
 package ustc.sce.service;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +35,7 @@ public class PaperServiceImp implements PaperService {
 	/**
 	 * 给论文增加文件
 	 */
-	public FileEntity addPDF(int paperId, int fileId) {
+	public Paper addPDF(int paperId, int fileId) {
 		return paperDao.addPDF(paperId,fileId);
 	}
 
@@ -45,18 +47,12 @@ public class PaperServiceImp implements PaperService {
 	}
 
 	/**
-	 * 论文列表
+	 * 获取该论文所有文件
 	 */
-	public Page getForPage(int currentPage, int pageSize, int ispublic) {
-		return paperDao.getForPage(currentPage,pageSize,ispublic);
+	public List<FileEntity> paperFile(int paperId) {
+		return paperDao.paperFile(paperId);
 	}
 
-	/**
-	 * 根据论文题目进行查询
-	 */
-	public Page paperSearch(String keyWords, int currentPage, int pageSize, int ispublic) {
-		return paperDao.paperSearch(keyWords,currentPage,pageSize,ispublic);
-	}
 
 	
 

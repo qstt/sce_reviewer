@@ -5,8 +5,6 @@ import ustc.sce.domain.User;
 
 public interface PaperReviewDao {
 
-	PaperReview notReview(int paperStatus, int paperId, User user);
-
-	PaperReview changeReview(int paperStatus, String paperTitle);
+	PaperReview submitPaper(int paperId, int teacherId);
 
 }

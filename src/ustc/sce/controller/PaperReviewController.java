@@ -3,6 +3,7 @@ package ustc.sce.controller;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,42 +33,24 @@ public class PaperReviewController {
 	private TokenUtil tokenUtil;
 	
 	/**
-	 * 未评审状态0
+	 * 提交论文
 	 * @param paperStatus
 	 * @param paperTitle
 	 * @return
 	 */
-	@RequestMapping(value = "/not-review",method = RequestMethod.POST)
-	public String notReview(@RequestParam("paperStatus") int paperStatus,@RequestParam("paperId") int paperId,HttpServletRequest request) {
+	@RequestMapping(value = "/submit_paper/{paperId}/{teacherId}",method = RequestMethod.POST)
+	public String submitPaper(@PathVariable("paperId") int paperId,@PathVariable("teacherId") int teacherId) {
 		
-		String header = request.getHeader("X-Token");
-		User user = tokenUtil.getUser(header);
-		
-		PaperReview paperReview = paperReviewService.notReview(paperStatus,paperId,user);
+		PaperReview paperReview = paperReviewService.submitPaper(paperId,teacherId);
 		
 		if (paperReview != null) {
 			return JSON.toJSONString(new Response().success(paperReview));
 		}
-		return JSON.toJSONString(new Response().failure("notReview Failure..."));
-		
+		return JSON.toJSONString(new Response().failure("Submit Paper Failure..."));
 	}
 	
-	/**
-	 * 状态改变  未评审到正在评审  正在评审到已定稿
-	 * @param paperStatus
-	 * @param paperTitle
-	 * @return
-	 */
-	@RequestMapping(value = "/change-review",method = RequestMethod.POST)
-	public String changeReview(@RequestParam("paperStatus") int paperStatus,@RequestParam("paperTitle") String paperTitle) {
-		
-		PaperReview paperReview = paperReviewService.changeReview(paperStatus,paperTitle);
-		
-		if (paperReview != null) {
-			return JSON.toJSONString(new Response().success(paperReview));
-		}
-		return JSON.toJSONString(new Response().failure("changeReview Failure..."));
-		
-	}
+	
+	
+	
 
 }

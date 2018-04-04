@@ -10,6 +10,7 @@ public class Role {
 	private int id;
 	//用户角色：老师  学生
 	private String roleName;
+	
 	public int getId() {
 		return id;
 	}
