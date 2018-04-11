@@ -1,5 +1,6 @@
 package ustc.sce.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -44,12 +45,22 @@ public class PaperController {
 	 * @param request 获得用户
 	 * @param fileId 所关联文件id
 	 * @return 论文信息
+	 * @throws UnsupportedEncodingException 
 	 */
 	@RequestMapping(value = "/create", method = RequestMethod.POST,produces=("application/json;charset=UTF-8"))
-	public String createPaper(@RequestBody Paper paper,HttpServletRequest request,
-			@RequestParam(value = "fileId",required = false,defaultValue = "-1") Integer fileId) {
+	public String createPaper(@RequestBody Paper paper,
+			@RequestParam(value = "fileId",required = false,defaultValue = "-1") Integer fileId,
+			HttpServletRequest request) throws UnsupportedEncodingException {
 		
-//		String paperTitle1=new String(paperTitle.getBytes("iso-8859-1"), "utf-8");
+//		@RequestParam(value = "paperTitle",required = false) String paperTitle,
+//		@RequestParam(value = "paperAuthor",required = false,defaultValue = "-1") String paperAuthor,
+//		@RequestParam(value = "ispublic",required = false) boolean ispublic,
+//		
+//		paperTitle=new String(paperTitle.getBytes("iso-8859-1"), "utf-8");
+//		Paper paper = new Paper();
+//		paper.setPaperTitle(paperTitle);
+//		paper.setPaperAuthor(paperAuthor);
+//		paper.setIspublic(ispublic);
 		
 		String header = request.getHeader("X-Token");
 		User user = tokenUtil.getUser(header);
@@ -83,7 +94,7 @@ public class PaperController {
 	 * @param request
 	 * @return 删除成功/失败
 	 */
-	@RequestMapping(value = "/delete/{paperId}", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
+	@RequestMapping(value = "/delete/{paperId}", method = RequestMethod.POST,produces = "text/html;charset=utf-8")
 	public String paperDelete(@PathVariable("paperId") int paperId,HttpServletRequest request) {
 		boolean flag = paperService.paperDelete(paperId,request);
 		if (flag) {

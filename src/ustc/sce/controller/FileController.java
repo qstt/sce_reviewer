@@ -57,9 +57,13 @@ public class FileController {
 	 * @return 文件信息/上传失败
 	 */
 	@RequestMapping(value = "/upload", method = RequestMethod.POST, produces = "text/html;charset=utf-8")
-	public String fileUplod(@RequestParam("file") MultipartFile file, HttpServletRequest request)
+	public String fileUplod(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request)
 			throws Exception{
-
+		
+		if(file == null) {
+			return JSON.toJSONString(new Response().failure("FileUpload Failure..."));
+		}
+		
 		FileEntity fileUpload = new FileEntity();
 
 		if (!file.isEmpty()) {
@@ -120,7 +124,7 @@ public class FileController {
 	 * @param request
 	 * @return 删除成功/失败
 	 */
-	@RequestMapping(value = "/delete/{fileId}", method = RequestMethod.GET,produces = "text/html;charset=utf-8")
+	@RequestMapping(value = "/delete/{fileId}", method = RequestMethod.POST,produces = "text/html;charset=utf-8")
 	public String fileDelete(@PathVariable("fileId") int fileId,HttpServletRequest request) {
 		boolean flag = fileService.fileDelete(fileId,request);
 		if (flag) {
@@ -170,16 +174,22 @@ public class FileController {
 	 * @param pageSize 每页显示记录条数  默认3
 	 * @param request
 	 * @return page
+	 * @throws UnsupportedEncodingException 
 	 */
-	@RequestMapping(value = "/user_list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String fileUserList(@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
+	@RequestMapping(value = "/user/list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String fileUserList(@RequestParam(value = "keyWords",required = false) String keyWords,
+			@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "3") int pageSize,
-			HttpServletRequest request) {
+			HttpServletRequest request) throws UnsupportedEncodingException {
+		
+		if(keyWords != null) {
+			keyWords=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
+		}
 		
 		String header = request.getHeader("X-Token");
 		User user = tokenUtil.getUser(header);
 
-		Page page = fileService.getForPage(Integer.valueOf(pageNo), pageSize,user);
+		Page page = fileService.getForPage(keyWords,Integer.valueOf(pageNo), pageSize,user);
 		List<FileEntity> pageFileEntity = page.getList();
 		if (!pageFileEntity.isEmpty()) {
 			for (int i = 0; i < pageFileEntity.size(); i++) {
@@ -245,7 +255,7 @@ public class FileController {
 	 * @return file 使用filePath
 	 * @throws Exception 
 	 */
-	@RequestMapping(value = "/show/{fileId}", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	@RequestMapping(value = "/pdf/{fileId}", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
 	public String fileShow(@PathVariable("fileId") int fileId,HttpServletRequest request,HttpServletResponse response) throws Exception {
 		FileEntity file = fileService.getFile(fileId);
 		if (file != null) {
@@ -280,7 +290,6 @@ public class FileController {
 			@RequestParam(value = "pageNo", required = false, defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize", required = false, defaultValue = "3") int pageSize,
 			HttpServletRequest request) throws UnsupportedEncodingException {
-		
 		keyWords=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
 		if(keyWords.isEmpty()) {
 			return JSON.toJSONString(new Response().failure("请输入文件名..."));

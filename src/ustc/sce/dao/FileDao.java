@@ -43,7 +43,7 @@ public interface FileDao {
 	 * @param request
 	 * @return List<FileEntity>
 	 */
-	Page getForPage(int currentPage, int pageSize, User user);
+	Page getForPage(String keyWords,int currentPage, int pageSize, User user);
 
 	/**
 	 * 不分页显示该用户上传的文件

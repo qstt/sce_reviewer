@@ -21,13 +21,6 @@ public class PublicPaperServiceImp implements PublicPaperService {
 	}
 
 	/**
-	 * 公开论文列表
-	 */
-	public Page getForPage(int currentPage, int pageSize) {
-		return publicPaperDao.getForPage(currentPage,pageSize);
-	}
-
-	/**
 	 * 公开论文 根据论文题目进行查找
 	 */
 	public Page publicPaperSearch(String keyWords,int currentPage, int pageSize) {

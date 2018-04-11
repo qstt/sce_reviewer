@@ -36,24 +36,6 @@ public class PublicPaperController {
 	private TokenUtil tokenUtil;
 	
 	/**
-	 * 公开论文列表
-	 * @param pageNo 当前页面  默认 1
-	 * @param pageSize 每页记录条数  默认 3
-	 * @return 论文信息
-	 */
-	@RequestMapping(value = "/list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String publicPaperList(@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
-			@RequestParam(value = "pageSize",required = false,defaultValue = "3") int pageSize) {
-				
-		Page page = publicPaperService.getForPage(Integer.valueOf(pageNo), pageSize);
-		List<Paper> paper = page.getList();
-		if (!paper.isEmpty()) {
-			return JSON.toJSONString(new Response().success(page));
-		}
-		return JSON.toJSONString(new Response().failure("List Failure..."));
-	}
-	
-	/**
 	 * 公开论文 根据论文题目进行查找
 	 * @param keyWords 查找关键字 
 	 * @param pageNo 当前页面    默认为1
@@ -61,14 +43,13 @@ public class PublicPaperController {
 	 * @return List<Paper>
 	 * @throws UnsupportedEncodingException 
 	 */
-	@RequestMapping(value = "/search", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
-	public String publicPaperSearch(@RequestParam("keyWords") String keyWords,
+	@RequestMapping(value = "/list", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
+	public String publicPaperSearch(@RequestParam(value = "keyWords",required = false) String keyWords,
 			@RequestParam(value = "pageNo",required = false,defaultValue = "1") String pageNo,
 			@RequestParam(value = "pageSize",required = false,defaultValue = "3")int pageSize) throws UnsupportedEncodingException {
 		
-		keyWords=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
-		if(keyWords.isEmpty()) {
-			return JSON.toJSONString(new Response().failure("请输论文名..."));
+		if(keyWords != null) {
+			keyWords=new String(keyWords.getBytes("iso-8859-1"), "utf-8");
 		}
 		
 		Page page = publicPaperService.publicPaperSearch(keyWords,Integer.valueOf(pageNo), pageSize);

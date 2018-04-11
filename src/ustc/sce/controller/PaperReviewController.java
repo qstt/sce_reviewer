@@ -38,7 +38,7 @@ public class PaperReviewController {
 	 * @param paperTitle
 	 * @return
 	 */
-	@RequestMapping(value = "/submit_paper/{paperId}/{teacherId}",method = RequestMethod.GET,produces="text/html;charset=utf-8")
+	@RequestMapping(value = "/submit_paper/{paperId}/{teacherId}",method = RequestMethod.POST,produces="text/html;charset=utf-8")
 	public String submitPaper(@PathVariable("paperId") int paperId,@PathVariable("teacherId") int teacherId) {
 		
 		PaperReview paperReview = paperReviewService.submitPaper(paperId,teacherId);

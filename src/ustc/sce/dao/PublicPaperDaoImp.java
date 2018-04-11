@@ -22,28 +22,24 @@ public class PublicPaperDaoImp extends HibernateDaoSupport implements PublicPape
 	}
 
 	/**
-	 * 公开论文列表
-	 */
-	public Page getForPage(int currentPage, int pageSize) {
-		
-		String hql1 = "SELECT COUNT(*) FROM Paper where ispublic ='"+1+"'";
-		String hql2="from Paper where ispublic ='"+1+"'";
-		
-		Page page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
-		return page;
-	}
-
-
-	/**
 	 * 公开论文 根据论文题目进行查找
 	 */
 	public Page publicPaperSearch(String keyWords, int currentPage, int pageSize) {
-		String hql1 = "SELECT COUNT(*) FROM Paper where paperTitle like '" + "%" + keyWords + "%" + "'"
+		Page page = new Page();
+		//列表
+		String hql1 = "SELECT COUNT(*) FROM Paper where ispublic ='"+1+"'";
+		String hql2="from Paper where ispublic ='"+1+"'";
+		//查找
+		String hql3 = "SELECT COUNT(*) FROM Paper where paperTitle like '" + "%" + keyWords + "%" + "'"
 				+ "and ispublic ='" + 1 + "'";
-		String hql2 = "from Paper where paperTitle like '" + "%" + keyWords + "%" + "'" + "and ispublic ='" + 1
+		String hql4 = "from Paper where paperTitle like '" + "%" + keyWords + "%" + "'" + "and ispublic ='" + 1
 				+ "'";
+		if(keyWords == null) {
+			page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
+		}else {
+			page = pageUtil.getForPage(hql3, hql4, currentPage, pageSize);
+		}
 		
-		Page page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
 		return page;
 	}
 

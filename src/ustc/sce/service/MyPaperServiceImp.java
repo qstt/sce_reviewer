@@ -14,12 +14,6 @@ public class MyPaperServiceImp implements MyPaperService {
 		this.myPaperDao = myPaperDao;
 	}
 
-
-	public Page myPaperList(User user, int currentPage, int pageSize) {
-		return myPaperDao.myPaperList(user,currentPage,pageSize);
-	}
-
-
 	@Override
 	public Page myPpaperSearch(User user, String keyWords, int currentPage, int pageSize) {
 		return myPaperDao.myPpaperSearch(user,keyWords,currentPage,pageSize);

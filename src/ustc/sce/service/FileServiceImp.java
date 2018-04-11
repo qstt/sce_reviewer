@@ -48,8 +48,8 @@ public class FileServiceImp implements FileService {
 	/**
 	 * 分页显示该用户上传的文件
 	 */
-	public Page getForPage(int currentPage, int pageSize, User user) {
-		return fileDao.getForPage(currentPage, pageSize,user);
+	public Page getForPage(String keyWords,int currentPage, int pageSize, User user) {
+		return fileDao.getForPage(keyWords,currentPage, pageSize,user);
 	}
 	
 	/**

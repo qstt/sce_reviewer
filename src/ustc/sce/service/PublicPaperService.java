@@ -11,13 +11,6 @@ import ustc.sce.domain.User;
  */
 public interface PublicPaperService {
 
-	/**
-	 * 公开论文列表
-	 * @param currentPage 当前页面
-	 * @param pageSize 每页记录条数
-	 * @return 论文信息
-	 */
-	Page getForPage(int currentPage, int pageSize);
 
 	/**
 	 * 公开论文 根据论文题目进行查找

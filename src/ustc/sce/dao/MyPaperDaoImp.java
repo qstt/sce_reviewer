@@ -13,28 +13,24 @@ public class MyPaperDaoImp extends HibernateDaoSupport implements MyPaperDao {
 		this.pageUtil = pageUtil;
 	}
 	
-
-	@Override
-	public Page myPaperList(User user, int currentPage, int pageSize) {
-		String paperOwner = user.getUserName();
-		String hql1 = "SELECT COUNT(*) FROM Paper where paperOwner ='" + paperOwner + "'";
-		String hql2 = "from Paper where paperOwner ='" + paperOwner + "'";
-
-		Page page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
-		return page;
-	}
-
-
 	@Override
 	public Page myPpaperSearch(User user, String keyWords, int currentPage, int pageSize) {
 		Page page = new Page();
-
 		String userName = user.getUserName();
-		String hql1 = "SELECT COUNT(*) from Paper as paper where paper.paperOwner='" + userName + "'"
+		//列表
+		String hql1 = "SELECT COUNT(*) FROM Paper where paperOwner ='" + userName + "'";
+		String hql2 = "from Paper where paperOwner ='" + userName + "'";
+		//查找
+		String hql3 = "SELECT COUNT(*) from Paper as paper where paper.paperOwner='" + userName + "'"
 				+ "and paperTitle like '" + "%" + keyWords + "%" + "'";
-		String hql2 = "from Paper as paper where paper.paperOwner='" + userName + "'"
+		String hql4 = "from Paper as paper where paper.paperOwner='" + userName + "'"
 				+ "and paperTitle like '" + "%" + keyWords + "%" + "'";
-		page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
+		
+		if(keyWords == null) {
+			page = pageUtil.getForPage(hql1, hql2, currentPage, pageSize);
+		}else {
+			page = pageUtil.getForPage(hql3, hql4, currentPage, pageSize);
+		}
 
 		return page;
 	}
